@@ -1,0 +1,1148 @@
+{
+  "users": [
+    {
+      "id": "user-admin",
+      "name": "Dazee SuperAdmin",
+      "email": "admin@hosteldazee.com",
+      "phone": "+91 98765 43210",
+      "passwordHash": "$2b$10$ER/Udq81E76y0Un7YK.Af.aKn7Mf/mn37VW/ZbdmJZHF4uwWs/716",
+      "role": "admin",
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "status": "active"
+    },
+    {
+      "id": "user-owner",
+      "name": "Rajesh Sharma",
+      "email": "owner@hosteldazee.com",
+      "phone": "+91 98230 11223",
+      "passwordHash": "$2b$10$hOC3xiTahIuQ4xSvDwa8Y.Uf2FRD0BdDMRSLapYN/LHR3hehEUZRi",
+      "role": "owner",
+      "isActive": true,
+      "createdAt": "2025-01-10T00:00:00.000Z",
+      "businessName": "Sharma Residency Group",
+      "verificationStatus": "approved",
+      "status": "active",
+      "govId": "AADHAAR-XXXX-8921"
+    },
+    {
+      "id": "user-student",
+      "name": "Aarav Mehta",
+      "email": "student@hosteldazee.com",
+      "phone": "+91 98112 33445",
+      "passwordHash": "$2b$10$zMg5Eo360TIUDC/SwM8VeeiMgtq5N3Z/2xPXtYtI0s.4F9VQKKaZy",
+      "role": "student",
+      "isActive": true,
+      "createdAt": "2025-02-01T00:00:00.000Z",
+      "status": "active"
+    },
+    {
+      "id": "ab2c78d6-5246-42f5-8425-41276c0a00df",
+      "name": "Google Student",
+      "email": "google.student@hosteldazee.com",
+      "phone": "",
+      "passwordHash": "$2b$10$8nzjo9NPa.bdClpANnLVOOlQ0aqdgc4/izR8G5Y5obK29FHrU7AHC",
+      "role": "student",
+      "isActive": true,
+      "createdAt": "2026-09-13T19:19:55.466Z",
+      "status": "active"
+    }
+  ],
+  "properties": [
+    {
+      "id": "prop-1",
+      "ownerId": "user-owner",
+      "name": "Hostel Dazee Premium Living",
+      "tagline": "Curated student co-living with premium vibes",
+      "description": "A premier co-living space designed specifically for students and early-career tech professionals in Bengaluru's vibrant hub. Offers chef-prepared healthy meals, gigabit optical Wi-Fi, biometric keyless entry, fully air-conditioned rooms, and dedicated acoustic study pods.",
+      "propertyType": "Co-living",
+      "genderType": "Unisex",
+      "address": "4th Block, 80 Feet Road, Near Sony World Signal",
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "pincode": "560034",
+      "landmark": "Near Christ University & St. John's Hospital",
+      "startingRent": 8999,
+      "rating": 4.8,
+      "reviewCount": 46,
+      "status": "rejected",
+      "featured": true,
+      "images": [
+        "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "Air Conditioning",
+        "Laundry Service",
+        "24/7 CCTV & Security",
+        "Power Backup",
+        "Housekeeping",
+        "Study Lounge",
+        "Biometric Access"
+      ],
+      "houseRules": [
+        "Visitors permitted in common lobby until 9:00 PM",
+        "Strictly non-smoking campus",
+        "Quiet hours observed from 11:00 PM to 6:00 AM",
+        "Valid government ID mandatory at check-in"
+      ],
+      "createdAt": "2025-01-15T00:00:00.000Z",
+      "latitude": 12.9352,
+      "longitude": 77.6245,
+      "formattedAddress": "4th Block, 80 Feet Road, Near Sony World Signal, Bengaluru, Karnataka 560034",
+      "location": {
+        "address": "4th Block, 80 Feet Road, Near Sony World Signal",
+        "city": "Bengaluru",
+        "state": "Karnataka",
+        "pincode": "560034",
+        "formattedAddress": "4th Block, 80 Feet Road, Near Sony World Signal, Bengaluru, Karnataka 560034",
+        "latitude": 12.9352,
+        "longitude": 77.6245
+      },
+      "rejectionReason": "hh"
+    },
+    {
+      "id": "prop-2",
+      "ownerId": "user-owner",
+      "name": "Dazee Ivy Scholars Residency",
+      "tagline": "Safe, serene & welcoming haven for female scholars",
+      "description": "Nestled right across Symbiosis University in Viman Nagar. This girls-only accommodation offers complete peace of mind with 3-tier round-the-clock security, fingerprint access, home-cooked organic meals, attached clean bathrooms, and a garden terrace.",
+      "propertyType": "PG",
+      "genderType": "Girls only",
+      "address": "Lane 3, Behind Phoenix Marketcity, Viman Nagar",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "pincode": "411014",
+      "landmark": "500m from Symbiosis Campus",
+      "startingRent": 7999,
+      "rating": 4.7,
+      "reviewCount": 38,
+      "status": "rejected",
+      "featured": true,
+      "images": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "24/7 CCTV & Security",
+        "Power Backup",
+        "Laundry Service",
+        "Housekeeping",
+        "Common Area"
+      ],
+      "houseRules": [
+        "Female visitors allowed in rooms; male visitors restricted to lobby",
+        "Entry gate closes at 10:30 PM with biometric check-in"
+      ],
+      "createdAt": "2025-01-20T00:00:00.000Z",
+      "latitude": 18.5679,
+      "longitude": 73.9143,
+      "formattedAddress": "Lane 3, Behind Phoenix Marketcity, Viman Nagar, Pune, Maharashtra 411014",
+      "location": {
+        "address": "Lane 3, Behind Phoenix Marketcity, Viman Nagar",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "pincode": "411014",
+        "formattedAddress": "Lane 3, Behind Phoenix Marketcity, Viman Nagar, Pune, Maharashtra 411014",
+        "latitude": 18.5679,
+        "longitude": 73.9143
+      },
+      "rejectionReason": "hh"
+    },
+    {
+      "id": "prop-3",
+      "ownerId": "user-owner",
+      "name": "Northstar Dazee Campus Hub",
+      "tagline": "Heart of Delhi University student life",
+      "description": "Prime student living located right in Hudson Lane. Walking distance to GTB Nagar Metro Station, Miranda House, SRCC, and Kirori Mal College. Equipped with ergonomic study chairs, gaming lounge, and customized North & South Indian cafeteria menu.",
+      "propertyType": "Hostel",
+      "genderType": "Boys only",
+      "address": "Hudson Lane, Near GTB Nagar Metro Gate 3",
+      "city": "Delhi NCR",
+      "state": "Delhi",
+      "pincode": "110009",
+      "landmark": "Near DU North Campus Arts Faculty",
+      "startingRent": 6999,
+      "rating": 4.6,
+      "reviewCount": 54,
+      "status": "approved",
+      "featured": true,
+      "images": [
+        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "Air Conditioning",
+        "24/7 CCTV & Security",
+        "Gym Access",
+        "Power Backup",
+        "Gaming Zone"
+      ],
+      "houseRules": [
+        "Maintain cleanliness in common spaces",
+        "No smoking or alcohol on premises"
+      ],
+      "createdAt": "2025-01-25T00:00:00.000Z",
+      "latitude": 28.4682,
+      "longitude": 77.4981,
+      "formattedAddress": "Hudson Lane, Near GTB Nagar Metro Gate 3, Delhi NCR, Delhi 110009",
+      "location": {
+        "address": "Hudson Lane, Near GTB Nagar Metro Gate 3",
+        "city": "Delhi NCR",
+        "state": "Delhi",
+        "pincode": "110009",
+        "formattedAddress": "Hudson Lane, Near GTB Nagar Metro Gate 3, Delhi NCR, Delhi 110009",
+        "latitude": 28.4682,
+        "longitude": 77.4981
+      }
+    },
+    {
+      "id": "prop-4",
+      "ownerId": "user-owner",
+      "name": "Dazee Silicon Heights",
+      "tagline": "Modern tech-ready coliving near IT corridor",
+      "description": "Strategically positioned in Gachibowli, moments from IIIT Hyderabad, Microsoft, and Amazon campuses. Ultra high-speed fiber internet, rooftop coffee deck, coworking pods, and automated laundry.",
+      "propertyType": "Co-living",
+      "genderType": "Unisex",
+      "address": "Telecom Nagar, Gachibowli",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "pincode": "500032",
+      "landmark": "Near IIIT Junction & Financial District",
+      "startingRent": 9499,
+      "rating": 4.9,
+      "reviewCount": 32,
+      "status": "approved",
+      "featured": false,
+      "images": [
+        "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "Air Conditioning",
+        "Laundry Service",
+        "Housekeeping",
+        "CCTV Security",
+        "Power Backup",
+        "Rooftop Cafe"
+      ],
+      "houseRules": [
+        "Keyless digital card access 24/7",
+        "Respect community privacy"
+      ],
+      "createdAt": "2025-02-05T00:00:00.000Z",
+      "latitude": 17.4401,
+      "longitude": 78.3489,
+      "formattedAddress": "Telecom Nagar, Gachibowli, Hyderabad, Telangana 500032",
+      "location": {
+        "address": "Telecom Nagar, Gachibowli",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "pincode": "500032",
+        "formattedAddress": "Telecom Nagar, Gachibowli, Hyderabad, Telangana 500032",
+        "latitude": 17.4401,
+        "longitude": 78.3489
+      }
+    },
+    {
+      "id": "prop-5",
+      "ownerId": "user-owner",
+      "name": "Dazee Serene Living Powai",
+      "tagline": "Boutique living near IIT Bombay & lake promenade",
+      "description": "Contemporary Scandinavian interiors designed for focused studying and refreshing downtime. 5 minutes from IIT Bombay campus with dedicated shuttle, nutritious buffet, and serene lakeside views.",
+      "propertyType": "PG",
+      "genderType": "Unisex",
+      "address": "Central Avenue, Hiranandani Gardens, Powai",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400076",
+      "landmark": "Opposite IIT Bombay Main Gate",
+      "startingRent": 11999,
+      "rating": 4.8,
+      "reviewCount": 27,
+      "status": "approved",
+      "featured": false,
+      "images": [
+        "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "Air Conditioning",
+        "Housekeeping",
+        "Laundry Service",
+        "CCTV Security",
+        "Power Backup",
+        "Study Lounge"
+      ],
+      "houseRules": [
+        "No smoking inside residences",
+        "Quiet hours starting 11 PM"
+      ],
+      "createdAt": "2025-02-12T00:00:00.000Z",
+      "latitude": 19.1176,
+      "longitude": 72.906,
+      "formattedAddress": "Central Avenue, Hiranandani Gardens, Powai, Mumbai, Maharashtra 400076",
+      "location": {
+        "address": "Central Avenue, Hiranandani Gardens, Powai",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400076",
+        "formattedAddress": "Central Avenue, Hiranandani Gardens, Powai, Mumbai, Maharashtra 400076",
+        "latitude": 19.1176,
+        "longitude": 72.906
+      }
+    },
+    {
+      "id": "prop-6",
+      "ownerId": "user-owner",
+      "name": "Dazee Sunrise Residency",
+      "tagline": "Budget-friendly student retreat on OMR",
+      "description": "Spacious, airy student hostel near Satyabhama University and OMR IT tech parks. Large open spaces, sports amenities, South & North Indian culinary spread, and 24/7 resident warden.",
+      "propertyType": "Hostel",
+      "genderType": "Unisex",
+      "address": "Rajiv Gandhi Salai, Sholinganallur, OMR",
+      "city": "Chennai",
+      "state": "Tamil Nadu",
+      "pincode": "600119",
+      "landmark": "Near Sathyabama University",
+      "startingRent": 6499,
+      "rating": 4.5,
+      "reviewCount": 21,
+      "status": "approved",
+      "featured": false,
+      "images": [
+        "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "Housekeeping",
+        "Laundry Service",
+        "CCTV Security",
+        "Power Backup",
+        "Sports Ground"
+      ],
+      "houseRules": [
+        "Adhere to hostel meal timings",
+        "ID verification at gate"
+      ],
+      "createdAt": "2025-02-18T00:00:00.000Z",
+      "latitude": 13.0067,
+      "longitude": 80.2026,
+      "formattedAddress": "Rajiv Gandhi Salai, Sholinganallur, OMR, Chennai, Tamil Nadu 600119",
+      "location": {
+        "address": "Rajiv Gandhi Salai, Sholinganallur, OMR",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "pincode": "600119",
+        "formattedAddress": "Rajiv Gandhi Salai, Sholinganallur, OMR, Chennai, Tamil Nadu 600119",
+        "latitude": 13.0067,
+        "longitude": 80.2026
+      }
+    },
+    {
+      "id": "prop-7",
+      "ownerId": "user-owner",
+      "name": "Dazee Scholar Nest - Kanpur",
+      "tagline": "Top-tier student living near IIT Kanpur & HBTI",
+      "description": "Premium student sanctuary in Kalyanpur, Kanpur. Minutes away from IIT Kanpur and CSJMU. Offers high-speed fiber internet, home-cooked thali meals, power backup for uninterrupted studying, and air-conditioned rooms.",
+      "propertyType": "Hostel",
+      "genderType": "Boys only",
+      "address": "GT Road, Kalyanpur",
+      "city": "Kanpur",
+      "state": "Uttar Pradesh",
+      "pincode": "208016",
+      "landmark": "1.2 km from IIT Kanpur Gate 1",
+      "startingRent": 5999,
+      "rating": 4.7,
+      "reviewCount": 19,
+      "status": "approved",
+      "featured": true,
+      "images": [
+        "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "Air Conditioning",
+        "24/7 CCTV & Security",
+        "Power Backup",
+        "Study Lounge"
+      ],
+      "houseRules": [
+        "No late night loitering",
+        "Visitors allowed in lobby"
+      ],
+      "createdAt": "2025-02-22T00:00:00.000Z",
+      "latitude": 26.5123,
+      "longitude": 80.2329,
+      "formattedAddress": "GT Road, Kalyanpur, Kanpur, Uttar Pradesh 208016",
+      "location": {
+        "address": "GT Road, Kalyanpur",
+        "city": "Kanpur",
+        "state": "Uttar Pradesh",
+        "pincode": "208016",
+        "formattedAddress": "GT Road, Kalyanpur, Kanpur, Uttar Pradesh 208016",
+        "latitude": 26.5123,
+        "longitude": 80.2329
+      }
+    },
+    {
+      "id": "prop-8",
+      "ownerId": "user-owner",
+      "name": "Dazee Heritage Residency - Lucknow",
+      "tagline": "Comfortable student PG near Gomti Nagar universities",
+      "description": "Serene student and co-living home located in Gomti Nagar, Lucknow. Convenient for students of BBD University, Amity Lucknow, and IIM Lucknow. Features RO purified water, buffet dining, and daily sanitization.",
+      "propertyType": "PG",
+      "genderType": "Unisex",
+      "address": "Vibhuti Khand, Gomti Nagar",
+      "city": "Lucknow",
+      "state": "Uttar Pradesh",
+      "pincode": "226010",
+      "landmark": "Near Wave Mall & Amity University",
+      "startingRent": 6499,
+      "rating": 4.6,
+      "reviewCount": 24,
+      "status": "approved",
+      "featured": false,
+      "images": [
+        "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "Laundry Service",
+        "Housekeeping",
+        "CCTV Security",
+        "Power Backup"
+      ],
+      "houseRules": [
+        "Quiet hours from 10:30 PM",
+        "Valid student ID required"
+      ],
+      "createdAt": "2025-02-25T00:00:00.000Z",
+      "latitude": 26.85,
+      "longitude": 80.9984,
+      "formattedAddress": "Vibhuti Khand, Gomti Nagar, Lucknow, Uttar Pradesh 226010",
+      "location": {
+        "address": "Vibhuti Khand, Gomti Nagar",
+        "city": "Lucknow",
+        "state": "Uttar Pradesh",
+        "pincode": "226010",
+        "formattedAddress": "Vibhuti Khand, Gomti Nagar, Lucknow, Uttar Pradesh 226010",
+        "latitude": 26.85,
+        "longitude": 80.9984
+      }
+    },
+    {
+      "id": "prop-9",
+      "ownerId": "user-owner",
+      "name": "Dazee Lakeview Hub - Bhopal",
+      "tagline": "Youthful student living near MANIT Bhopal",
+      "description": "Vibrant campus accommodation in MP Nagar, Bhopal. Steps away from Maulana Azad National Institute of Technology (MANIT) and Barkatullah University. High-speed optical Wi-Fi, hygienic cafeteria, and gaming lounge.",
+      "propertyType": "Hostel",
+      "genderType": "Unisex",
+      "address": "Zone II, Maharana Pratap Nagar",
+      "city": "Bhopal",
+      "state": "Madhya Pradesh",
+      "pincode": "462011",
+      "landmark": "Near MANIT Campus & Habibganj Station",
+      "startingRent": 5499,
+      "rating": 4.8,
+      "reviewCount": 18,
+      "status": "approved",
+      "featured": false,
+      "images": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "Housekeeping",
+        "CCTV Security",
+        "Power Backup",
+        "Common Area"
+      ],
+      "houseRules": [
+        "Gate closure at 10 PM",
+        "Quiet study hours"
+      ],
+      "createdAt": "2025-02-28T00:00:00.000Z",
+      "latitude": 23.2324,
+      "longitude": 77.4326,
+      "formattedAddress": "Zone II, Maharana Pratap Nagar, Bhopal, Madhya Pradesh 462011",
+      "location": {
+        "address": "Zone II, Maharana Pratap Nagar",
+        "city": "Bhopal",
+        "state": "Madhya Pradesh",
+        "pincode": "462011",
+        "formattedAddress": "Zone II, Maharana Pratap Nagar, Bhopal, Madhya Pradesh 462011",
+        "latitude": 23.2324,
+        "longitude": 77.4326
+      }
+    },
+    {
+      "id": "prop-10",
+      "ownerId": "user-owner",
+      "name": "Dazee Green Central - Bilaspur",
+      "tagline": "Affordable, hygienic student living in Bilaspur",
+      "description": "Dedicated student home catering to Guru Ghasidas Central University and CIMS medical college students. Safe neighborhood, delicious meals, laundry assistance, and spacious study tables.",
+      "propertyType": "PG",
+      "genderType": "Unisex",
+      "address": "Koni Road, Near Central University Campus",
+      "city": "Bilaspur",
+      "state": "Chhattisgarh",
+      "pincode": "495009",
+      "landmark": "Opposite GGU University Gate",
+      "startingRent": 4999,
+      "rating": 4.6,
+      "reviewCount": 15,
+      "status": "approved",
+      "featured": false,
+      "images": [
+        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "Housekeeping",
+        "CCTV Security",
+        "Power Backup",
+        "Study Lounge"
+      ],
+      "houseRules": [
+        "ID proof mandatory",
+        "No smoking on premises"
+      ],
+      "createdAt": "2025-03-01T00:00:00.000Z",
+      "latitude": 22.1287,
+      "longitude": 82.1384,
+      "formattedAddress": "Koni Road, Near Central University Campus, Bilaspur, Chhattisgarh 495009",
+      "location": {
+        "address": "Koni Road, Near Central University Campus",
+        "city": "Bilaspur",
+        "state": "Chhattisgarh",
+        "pincode": "495009",
+        "formattedAddress": "Koni Road, Near Central University Campus, Bilaspur, Chhattisgarh 495009",
+        "latitude": 22.1287,
+        "longitude": 82.1384
+      }
+    },
+    {
+      "id": "prop-pending-test",
+      "ownerId": "user-owner",
+      "name": "Dazee CyberCity Elite Hub",
+      "tagline": "Tech-park adjacent modern student suites",
+      "description": "Upcoming student hostel adjacent to major university campus with biometric access, high speed fiber, and modern study rooms.",
+      "propertyType": "Hostel",
+      "genderType": "Unisex",
+      "address": "DLF CyberCity Sector 24",
+      "city": "Delhi NCR",
+      "state": "Haryana",
+      "pincode": "122002",
+      "landmark": "Near Rapid Metro Station",
+      "startingRent": 11500,
+      "rating": 4.9,
+      "reviewCount": 0,
+      "status": "approved",
+      "featured": false,
+      "images": [
+        "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=85",
+        "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=85"
+      ],
+      "amenities": [
+        "High-Speed Wi-Fi",
+        "Daily Fresh Meals",
+        "Air Conditioning",
+        "Power Backup",
+        "24/7 CCTV & Security"
+      ],
+      "houseRules": [
+        "Valid college ID required",
+        "Gate closes at 10:30 PM",
+        "No smoking"
+      ],
+      "latitude": 28.49,
+      "longitude": 77.09,
+      "formattedAddress": "DLF CyberCity Sector 24, Delhi NCR, Haryana 122002",
+      "location": {
+        "address": "DLF CyberCity Sector 24",
+        "city": "Delhi NCR",
+        "state": "Haryana",
+        "pincode": "122002",
+        "formattedAddress": "DLF CyberCity Sector 24, Delhi NCR, Haryana 122002",
+        "latitude": 28.49,
+        "longitude": 77.09
+      },
+      "createdAt": "2026-09-13T19:43:00.106Z"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "room-101",
+      "propertyId": "prop-1",
+      "roomNumber": "101",
+      "floor": 1,
+      "roomType": "Single Sharing",
+      "rent": 14999,
+      "ac": true,
+      "sharingCapacity": 1,
+      "status": "available",
+      "features": [
+        "Private Attached Bath",
+        "Balcony View",
+        "Workstation Desk",
+        "Full Wardrobe"
+      ]
+    },
+    {
+      "id": "room-201",
+      "propertyId": "prop-1",
+      "roomNumber": "201",
+      "floor": 2,
+      "roomType": "Double Sharing",
+      "rent": 8999,
+      "ac": true,
+      "sharingCapacity": 2,
+      "status": "available",
+      "features": [
+        "Attached Bathroom",
+        "Twin Study Tables",
+        "Air Conditioning",
+        "Individual Lockers"
+      ]
+    },
+    {
+      "id": "room-202",
+      "propertyId": "prop-1",
+      "roomNumber": "202",
+      "floor": 2,
+      "roomType": "Double Sharing",
+      "rent": 7999,
+      "ac": false,
+      "sharingCapacity": 2,
+      "status": "available",
+      "features": [
+        "Twin Beds",
+        "High-speed Ethernet",
+        "Large Wardrobes",
+        "Ceiling Fan"
+      ]
+    },
+    {
+      "id": "room-301",
+      "propertyId": "prop-1",
+      "roomNumber": "301",
+      "floor": 3,
+      "roomType": "Triple Sharing",
+      "rent": 6999,
+      "ac": true,
+      "sharingCapacity": 3,
+      "status": "available",
+      "features": [
+        "Triple Bunk & Single",
+        "AC & Air Purifier",
+        "Spacious Balcony",
+        "Individual Storage"
+      ]
+    },
+    {
+      "id": "room-401",
+      "propertyId": "prop-1",
+      "roomNumber": "401",
+      "floor": 4,
+      "roomType": "Four Sharing",
+      "rent": 5999,
+      "ac": false,
+      "sharingCapacity": 4,
+      "status": "available",
+      "features": [
+        "Double Bunk Beds",
+        "Study Pods",
+        "Spacious Terrace Access",
+        "Budget Friendly"
+      ]
+    },
+    {
+      "id": "room-p2-101",
+      "propertyId": "prop-2",
+      "roomNumber": "101",
+      "floor": 1,
+      "roomType": "Single Sharing",
+      "rent": 12999,
+      "ac": true,
+      "sharingCapacity": 1,
+      "status": "available",
+      "features": [
+        "En-suite Bath",
+        "Dressing Mirror",
+        "Garden View",
+        "Bookshelf"
+      ]
+    },
+    {
+      "id": "room-p2-102",
+      "propertyId": "prop-2",
+      "roomNumber": "102",
+      "floor": 1,
+      "roomType": "Double Sharing",
+      "rent": 7999,
+      "ac": true,
+      "sharingCapacity": 2,
+      "status": "available",
+      "features": [
+        "Attached Bath",
+        "Study Tables",
+        "AC",
+        "Full Length Closets"
+      ]
+    },
+    {
+      "id": "room-p3-101",
+      "propertyId": "prop-3",
+      "roomNumber": "201",
+      "floor": 2,
+      "roomType": "Double Sharing",
+      "rent": 7499,
+      "ac": true,
+      "sharingCapacity": 2,
+      "status": "available",
+      "features": [
+        "AC",
+        "Ergonomic Chairs",
+        "DU Shuttle Stop Access",
+        "Locker System"
+      ]
+    },
+    {
+      "id": "room-p7-101",
+      "propertyId": "prop-7",
+      "roomNumber": "101",
+      "floor": 1,
+      "roomType": "Double Sharing",
+      "rent": 5999,
+      "ac": true,
+      "sharingCapacity": 2,
+      "status": "available",
+      "features": [
+        "IIT Shuttle Access",
+        "Study Desk",
+        "AC"
+      ]
+    },
+    {
+      "id": "room-p8-101",
+      "propertyId": "prop-8",
+      "roomNumber": "201",
+      "floor": 2,
+      "roomType": "Double Sharing",
+      "rent": 6499,
+      "ac": true,
+      "sharingCapacity": 2,
+      "status": "available",
+      "features": [
+        "Attached Washroom",
+        "Power Backup",
+        "Wardrobe"
+      ]
+    },
+    {
+      "id": "room-p9-101",
+      "propertyId": "prop-9",
+      "roomNumber": "101",
+      "floor": 1,
+      "roomType": "Double Sharing",
+      "rent": 5499,
+      "ac": false,
+      "sharingCapacity": 2,
+      "status": "available",
+      "features": [
+        "MANIT Bus Connectivity",
+        "Fast Wi-Fi"
+      ]
+    },
+    {
+      "id": "room-p10-101",
+      "propertyId": "prop-10",
+      "roomNumber": "101",
+      "floor": 1,
+      "roomType": "Double Sharing",
+      "rent": 4999,
+      "ac": false,
+      "sharingCapacity": 2,
+      "status": "available",
+      "features": [
+        "Near Central University",
+        "Nutritious Meals"
+      ]
+    },
+    {
+      "id": "room-pending-1",
+      "propertyId": "prop-pending-test",
+      "roomNumber": "101",
+      "floor": 1,
+      "roomType": "Single Sharing",
+      "rent": 11500,
+      "ac": true,
+      "sharingCapacity": 1,
+      "status": "available",
+      "features": [
+        "Attached Washroom",
+        "Balcony View",
+        "Study Desk"
+      ]
+    }
+  ],
+  "beds": [
+    {
+      "id": "bed-101-a",
+      "roomId": "room-101",
+      "bedNumber": "Bed A",
+      "status": "OCCUPIED",
+      "bookingId": "booking-1789329019474",
+      "occupantName": "Aarav Mehta (Confirmed)"
+    },
+    {
+      "id": "bed-201-a",
+      "roomId": "room-201",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-201-b",
+      "roomId": "room-201",
+      "bedNumber": "Bed B",
+      "status": "OCCUPIED",
+      "occupantName": "Aarav M. (Resident)"
+    },
+    {
+      "id": "bed-202-a",
+      "roomId": "room-202",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-202-b",
+      "roomId": "room-202",
+      "bedNumber": "Bed B",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-301-a",
+      "roomId": "room-301",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-301-b",
+      "roomId": "room-301",
+      "bedNumber": "Bed B",
+      "status": "OCCUPIED",
+      "occupantName": "Dev K."
+    },
+    {
+      "id": "bed-301-c",
+      "roomId": "room-301",
+      "bedNumber": "Bed C",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-401-a",
+      "roomId": "room-401",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-401-b",
+      "roomId": "room-401",
+      "bedNumber": "Bed B",
+      "status": "OCCUPIED",
+      "occupantName": "Kunal S."
+    },
+    {
+      "id": "bed-401-c",
+      "roomId": "room-401",
+      "bedNumber": "Bed C",
+      "status": "OCCUPIED",
+      "occupantName": "Rohan P."
+    },
+    {
+      "id": "bed-401-d",
+      "roomId": "room-401",
+      "bedNumber": "Bed D",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p2-101-a",
+      "roomId": "room-p2-101",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p2-102-a",
+      "roomId": "room-p2-102",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p2-102-b",
+      "roomId": "room-p2-102",
+      "bedNumber": "Bed B",
+      "status": "OCCUPIED",
+      "occupantName": "Sneha V."
+    },
+    {
+      "id": "bed-p3-101-a",
+      "roomId": "room-p3-101",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p3-101-b",
+      "roomId": "room-p3-101",
+      "bedNumber": "Bed B",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p7-101-a",
+      "roomId": "room-p7-101",
+      "bedNumber": "Bed A",
+      "status": "OCCUPIED",
+      "bookingId": "booking-1789327253767",
+      "occupantName": "Google Student (Confirmed)"
+    },
+    {
+      "id": "bed-p7-101-b",
+      "roomId": "room-p7-101",
+      "bedNumber": "Bed B",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p8-101-a",
+      "roomId": "room-p8-101",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p8-101-b",
+      "roomId": "room-p8-101",
+      "bedNumber": "Bed B",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p9-101-a",
+      "roomId": "room-p9-101",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p9-101-b",
+      "roomId": "room-p9-101",
+      "bedNumber": "Bed B",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p10-101-a",
+      "roomId": "room-p10-101",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-p10-101-b",
+      "roomId": "room-p10-101",
+      "bedNumber": "Bed B",
+      "status": "AVAILABLE"
+    },
+    {
+      "id": "bed-pending-1",
+      "roomId": "room-pending-1",
+      "bedNumber": "Bed A",
+      "status": "AVAILABLE"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "booking-demo-1",
+      "bookingReference": "DZ-9824X",
+      "studentId": "user-student",
+      "studentName": "Aarav Mehta",
+      "studentPhone": "+91 98112 33445",
+      "studentEmail": "student@hosteldazee.com",
+      "propertyId": "prop-1",
+      "propertyName": "Hostel Dazee Premium Living",
+      "roomId": "room-201",
+      "roomNumber": "201",
+      "roomType": "Double Sharing",
+      "bedId": "bed-201-b",
+      "bedNumber": "Bed B",
+      "startDate": "2025-08-01",
+      "duration": 6,
+      "monthlyRent": 8999,
+      "securityDeposit": 8999,
+      "serviceFee": 999,
+      "amount": 18997,
+      "paymentStatus": "SUCCESS",
+      "bookingStatus": "CONFIRMED",
+      "transactionId": "RZP_PAY_981248A",
+      "createdAt": "2025-07-28T14:30:00.000Z"
+    },
+    {
+      "id": "booking-1789327253767",
+      "bookingReference": "DZ-MU078X6V",
+      "studentId": "ab2c78d6-5246-42f5-8425-41276c0a00df",
+      "studentName": "Google Student",
+      "studentEmail": "google.student@hosteldazee.com",
+      "studentPhone": "+91 98112 33445",
+      "dob": "2003-05-15",
+      "emergencyContact": "+91 98220 99887 (Parent)",
+      "idProofType": "Aadhaar Card",
+      "idProofNumber": "XXXX-XXXX-4589",
+      "propertyId": "prop-7",
+      "propertyName": "Dazee Scholar Nest - Kanpur",
+      "propertyAddress": "GT Road, Kalyanpur, Kanpur",
+      "roomId": "room-p7-101",
+      "roomNumber": "101",
+      "roomType": "Double Sharing",
+      "bedId": "bed-p7-101-a",
+      "bedNumber": "Bed A",
+      "startDate": "2026-09-16",
+      "duration": 1,
+      "monthlyRent": 5999,
+      "securityDeposit": 5999,
+      "serviceFee": 999,
+      "amount": 12997,
+      "paymentStatus": "SUCCESS",
+      "bookingStatus": "CONFIRMED",
+      "createdAt": "2026-09-13T19:20:53.767Z",
+      "transactionId": "RZP_TXN_1789327255309"
+    },
+    {
+      "id": "booking-1789329019474",
+      "bookingReference": "DZ-MU08ARMA",
+      "studentId": "user-student",
+      "studentName": "Aarav Mehta",
+      "studentEmail": "student@hosteldazee.com",
+      "studentPhone": "+91 98112 33445",
+      "dob": "",
+      "emergencyContact": "",
+      "idProofType": "Aadhaar",
+      "idProofNumber": "",
+      "propertyId": "prop-1",
+      "propertyName": "Hostel Dazee Premium Living",
+      "propertyAddress": "4th Block, 80 Feet Road, Near Sony World Signal, Bengaluru",
+      "roomId": "room-101",
+      "roomNumber": "101",
+      "roomType": "Single Sharing",
+      "bedId": "bed-101-a",
+      "bedNumber": "Bed A",
+      "startDate": "2026-09-13",
+      "duration": 6,
+      "monthlyRent": 14999,
+      "securityDeposit": 14999,
+      "serviceFee": 999,
+      "amount": 30997,
+      "paymentStatus": "SUCCESS",
+      "bookingStatus": "CONFIRMED",
+      "createdAt": "2026-09-13T19:50:19.474Z",
+      "transactionId": "pay_rzp_1789329019476"
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay-demo-1",
+      "bookingId": "booking-demo-1",
+      "bookingReference": "DZ-9824X",
+      "studentId": "user-student",
+      "studentName": "Aarav Mehta",
+      "amount": 18997,
+      "transactionId": "RZP_PAY_981248A",
+      "paymentMethod": "Razorpay Instant UPI",
+      "paymentStatus": "SUCCESS",
+      "createdAt": "2025-07-28T14:32:10.000Z"
+    },
+    {
+      "id": "pay-1789327255318",
+      "bookingId": "booking-1789327253767",
+      "bookingReference": "DZ-MU078X6V",
+      "studentId": "ab2c78d6-5246-42f5-8425-41276c0a00df",
+      "studentName": "Google Student",
+      "amount": 12997,
+      "transactionId": "RZP_TXN_1789327255309",
+      "paymentMethod": "Razorpay UPI / NetBanking",
+      "paymentStatus": "SUCCESS",
+      "createdAt": "2026-09-13T19:20:55.318Z"
+    },
+    {
+      "id": "pay-1789329019481",
+      "bookingId": "booking-1789329019474",
+      "bookingReference": "DZ-MU08ARMA",
+      "studentId": "user-student",
+      "studentName": "Aarav Mehta",
+      "amount": 30997,
+      "transactionId": "pay_rzp_1789329019476",
+      "paymentMethod": "Razorpay UPI",
+      "paymentStatus": "SUCCESS",
+      "createdAt": "2026-09-13T19:50:19.481Z"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "rev-1",
+      "propertyId": "prop-1",
+      "userName": "Priya Sharma",
+      "userRole": "Christ University Student",
+      "rating": 5,
+      "comment": "Finding Hostel Dazee was a lifesaver when moving to Bengaluru! The optical Wi-Fi never drops during online exams, and the meals actually taste like home food.",
+      "createdAt": "2025-02-10T11:00:00.000Z"
+    },
+    {
+      "id": "rev-2",
+      "propertyId": "prop-1",
+      "userName": "Rohan Deshmukh",
+      "userRole": "Software Intern, Koramangala",
+      "rating": 5,
+      "comment": "The visual bed selector made it super easy to pick the window bed in Room 201. The staff is polite and maintenance requests are solved within an hour.",
+      "createdAt": "2025-02-14T16:20:00.000Z"
+    },
+    {
+      "id": "rev-3",
+      "propertyId": "prop-2",
+      "userName": "Ananya Kulkarni",
+      "userRole": "Symbiosis Law School",
+      "rating": 5,
+      "comment": "Extremely safe for girls with biometric access and strict visitor protocols. The study terrace is my favorite spot to prepare for exams.",
+      "createdAt": "2025-02-20T09:15:00.000Z"
+    },
+    {
+      "id": "rev-4",
+      "propertyId": "prop-3",
+      "userName": "Vikram Singh",
+      "userRole": "SRCC Student",
+      "rating": 4.8,
+      "comment": "Hudson Lane location is unbeatable. 5 minutes walk to college and metro. Great community of fellow university students.",
+      "createdAt": "2025-02-24T18:40:00.000Z"
+    },
+    {
+      "id": "rev-5",
+      "propertyId": "prop-7",
+      "userName": "Anurag Mishra",
+      "userRole": "IIT Kanpur Scholar",
+      "rating": 4.9,
+      "comment": "Best hostel in Kalyanpur for serious students. Peaceful environment, zero power cuts, and very close to gate 1.",
+      "createdAt": "2025-03-02T10:00:00.000Z"
+    }
+  ]
+}
