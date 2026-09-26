@@ -248,7 +248,7 @@ app.post('/api/auth/logout', async (req, res) => {
 })
 
 app.get('/api/auth/me', auth, async (req, res) => {
-  const user = read().users.find((item) => item.id === req.user.id)
+  const user = (await read()).users.find((item) => item.id === req.user.id)
   if (!user) return response(res, null, 'User session not found', 404)
   return response(res, { id: user.id, name: user.name, email: user.email, role: user.role, phone: user.phone })
 })
