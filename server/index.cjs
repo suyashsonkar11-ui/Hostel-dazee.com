@@ -793,8 +793,16 @@ app.post('/api/payments/create-order', auth, async (req, res) => {
 })
 
 app.post('/api/payments/create', auth, async (req, res) => {
-  req.body = { ...req.body }
-  return app._router ? response(res, null, 'Demo payment mode is active. Use the payment verification endpoint to complete the booking.', 200) : response(res, null, 'Demo payment mode is active.', 200)
+  const { bookingId } = req.body
+  const db = await read()
+  const booking = db.bookings.find((b) => b.id === bookingId)
+  if (!booking) return response(res, null, 'Booking not found', 404)
+  if (req.user.role !== 'admin' && booking.studentId !== req.user.id) return response(res, null, 'Unauthorized payment access', 403)
+  if (booking.paymentStatus === 'SUCCESS') return response(res, null, 'Booking is already paid', 400)
+  const demoOrder = { orderId: 'demo_order_' + crypto.randomUUID().replace(/-/g, '').slice(0, 16), amount: booking.amount, currency: 'INR', mode: 'DEMO' }
+  booking.demoPaymentOrderId = demoOrder.orderId
+  await write(db)
+  return response(res, demoOrder, 'Demo payment order created')
 })
 
 app.post('/api/payments/verify', auth, async (req, res) => {
