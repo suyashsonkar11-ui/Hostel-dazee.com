@@ -49,6 +49,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    // Safari can surface a native "The string did not match the expected pattern."
+    // validation message for controlled email inputs. Validate explicitly so the
+    // demo login and normal login behave consistently across browsers.
+    if (mode !== 'forgot' && !email.trim()) {
+      setError('Please enter your email address.')
+      return
+    }
+    if (mode !== 'forgot' && !password) {
+      setError('Please enter your password.')
+      return
+    }
     setInfoMessage('')
     setLoading(true)
 
@@ -197,7 +209,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {mode === 'signup' && (
               <>
                 <div>
@@ -280,7 +292,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
                 <input
                   type="password"
-                  required
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                   className="filter-select"
                   style={{ width: '100%' }}
                   placeholder="••••••••"
