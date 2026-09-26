@@ -930,3 +930,59 @@ a {
 .dashboard-shell { background:#0a0b0b; }
 .dashboard-sidebar { background:#111212; border-color:rgba(215,173,90,.16); }
 .dashboard-nav-item.active { background:rgba(215,173,90,.12); color:#e2ba68; }
+
+
+/* --- LIVE-HAVEN INSPIRED HOMEPAGE FINISH --- */
+body { background:#06130f; }
+main { background:#06130f; }
+.navbar-sticky { background:rgba(3,12,10,.68); border-bottom:1px solid rgba(215,173,90,.13); }
+.brand-logo { font-family:Georgia,'Times New Roman',serif; font-weight:500; letter-spacing:.01em; }
+.brand-icon { width:2.15rem; height:2.15rem; border-radius:7px; background:transparent; border:1px solid rgba(215,173,90,.75); color:#d7ad5a; }
+.nav-links-desktop { gap:1.8rem; }
+.nav-link { color:#e1ded5; font-size:.86rem; }
+.nav-actions .btn-outline { color:#eee9dd; border-color:rgba(255,255,255,.22); }
+.hero-wrapper { min-height:700px; }
+.hero-container { min-height:700px; }
+.hero-copy { padding:6.2rem 0 5rem; }
+.hero-title { font-family:Georgia,'Times New Roman',serif; font-weight:400; font-size:clamp(3.5rem,6.4vw,6rem); }
+.hero-title em { color:#d7ad5a; }
+.hero-search-card { background:rgba(4,34,27,.78); border-color:rgba(119,170,143,.38); border-radius:20px; }
+.hero-search-heading { color:#eee9dd; }
+.hero-stats { max-width:900px; padding:1rem 1.3rem; background:rgba(3,34,27,.72); border:1px solid rgba(255,255,255,.06); border-radius:12px; justify-content:space-between; gap:1rem; }
+.hero-stat-item { min-width:120px; }
+.hero-stat-item strong { color:#f2ede2; font-family:Georgia,serif; }
+.hero-stat-item span { color:#a9b2aa; }
+.explore-section { background:linear-gradient(180deg,#06130f 0%,#061a14 100%) !important; padding:4.5rem 0 5rem; }
+.section-title { font-family:Georgia,'Times New Roman',serif; font-weight:400; font-size:2.35rem; }
+.section-header { align-items:end; }
+.properties-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+.property-card { background:#06231a !important; border:1px solid rgba(101,157,130,.25); border-radius:16px; }
+.property-card:hover { border-color:rgba(215,173,90,.5); }
+.card-media { height:230px; }
+.card-body { padding:1rem 1.05rem 1.1rem; }
+.card-title { font-family:Georgia,'Times New Roman',serif; font-size:1.12rem; font-weight:500; }
+.card-location { color:#aeb9b1 !important; }
+.card-footer-row { border-color:rgba(101,157,130,.2); }
+.card-price-block strong { font-family:Georgia,'Times New Roman',serif; color:#e4bd69 !important; }
+.card-wishlist-btn { background:rgba(4,18,15,.72); color:#fff; border:1px solid rgba(255,255,255,.18); }
+.filters-bar { background:#062019 !important; border-color:rgba(101,157,130,.25); }
+.filter-pill { background:#092a21; border-color:rgba(101,157,130,.25); }
+.filter-pill.active { background:#d7ad5a; color:#111; }
+.filter-select { background:#092a21 !important; color:#eee9dd !important; }
+.explore-section .eyebrow { color:#d7ad5a; }
+.why-section,.reviews-section,.contact-section { background:#06130f !important; color:#f7f2e8; }
+.why-section h2,.reviews-section h2,.contact-section h2 { color:#f7f2e8 !important; font-family:Georgia,'Times New Roman',serif; font-weight:400 !important; }
+.why-section [style*="background: #0f172a"],.reviews-section [style*="background: #ffffff"],.contact-section [style*="background: #f8fafc"] { background:#06231a !important; border-color:rgba(101,157,130,.25) !important; }
+.why-section [style*="color: #334155"],.contact-section [style*="color: #334155"] { color:#c4cbc6 !important; }
+.owner-banner { background:linear-gradient(135deg,#06231a,#04120f) !important; border-top:1px solid rgba(215,173,90,.12); border-bottom:1px solid rgba(215,173,90,.12); }
+footer { background:#030d0a !important; }
+@media (max-width:960px) {
+  .properties-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:640px) {
+  .properties-grid { grid-template-columns:1fr; }
+  .hero-wrapper,.hero-container { min-height:650px; }
+  .hero-copy { padding:5rem 0 3rem; }
+  .hero-title { font-size:3.15rem; }
+  .hero-stats { display:grid; grid-template-columns:1fr 1fr; }
+}
