@@ -770,68 +770,57 @@ app.put('/api/bookings/:id/cancel', auth, async (req, res) => {
   return response(res, booking, 'Booking cancelled and bed released to available pool')
 })
 
-// --- PAYMENTS (RAZORPAY INTEGRATION) ---
+// --- PAYMENTS (DEMO MODE) ---
+// Real Razorpay gateway is intentionally disabled for the current demo period.
+// These endpoints preserve the frontend contract and create demo payment records only.
 app.post('/api/payments/create-order', auth, async (req, res) => {
   const { bookingId } = req.body
   const db = await read()
   const booking = db.bookings.find((b) => b.id === bookingId)
   if (!booking) return response(res, null, 'Booking not found', 404)
+  if (req.user.role !== 'admin' && booking.studentId !== req.user.id) return response(res, null, 'Unauthorized payment access', 403)
+  if (booking.paymentStatus === 'SUCCESS') return response(res, null, 'Booking is already paid', 400)
 
-  const razorpayOrder = {
-    orderId: `order_dz_${Date.now()}`,
-    amount: booking.amount * 100, // in paise
+  const demoOrder = {
+    orderId: `demo_order_${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`,
+    amount: booking.amount,
     currency: 'INR',
-    receipt: booking.bookingReference,
-    key: process.env.RAZORPAY_KEY_ID || 'rzp_test_hostel_dazee_demo',
-    booking,
+    mode: 'DEMO',
   }
-  booking.razorpayOrderId = razorpayOrder.orderId
+  booking.demoPaymentOrderId = demoOrder.orderId
   await write(db)
-
-  return response(res, razorpayOrder, 'Razorpay order generated')
+  return response(res, demoOrder, 'Demo payment order created')
 })
 
 app.post('/api/payments/create', auth, async (req, res) => {
-  const { bookingId } = req.body
-  const db = await read()
-  const booking = db.bookings.find((b) => b.id === bookingId)
-  if (!booking) return response(res, null, 'Booking not found', 404)
-
-  const razorpayOrder = {
-    orderId: `order_dz_${Date.now()}`,
-    amount: booking.amount * 100,
-    currency: 'INR',
-    receipt: booking.bookingReference,
-    key: process.env.RAZORPAY_KEY_ID || 'rzp_test_hostel_dazee_demo',
-    booking,
-  }
-
-  return response(res, razorpayOrder, 'Razorpay order generated')
+  req.body = { ...req.body }
+  return app._router ? response(res, null, 'Demo payment mode is active. Use the payment verification endpoint to complete the booking.', 200) : response(res, null, 'Demo payment mode is active.', 200)
 })
 
 app.post('/api/payments/verify', auth, async (req, res) => {
-  const { bookingId, paymentId, paymentSignature, paymentMethod = 'Razorpay UPI' } = req.body
+  const { bookingId, paymentId, paymentMethod = 'Demo Payment' } = req.body
   const db = await read()
   const booking = db.bookings.find((b) => b.id === bookingId)
   if (!booking) return response(res, null, 'Booking not found', 404)
   if (req.user.role !== 'admin' && booking.studentId !== req.user.id) return response(res, null, 'Unauthorized payment access', 403)
-  if (!paymentId || !paymentSignature || !process.env.RAZORPAY_KEY_SECRET) return response(res, null, 'Razorpay signature verification is required.', 503)
-  const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET).update((booking.razorpayOrderId || '') + '|' + paymentId).digest('hex')
-  if (expectedSignature.length !== String(paymentSignature).length || !crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(String(paymentSignature)))) return response(res, null, 'Invalid Razorpay payment signature', 400)
+  if (booking.paymentStatus === 'SUCCESS') return response(res, { booking }, 'Booking is already confirmed')
 
+  const room = db.rooms.find((r) => r.id === booking.roomId)
   const bed = db.beds.find((b) => b.id === booking.bedId)
+  if (!room || !bed) return response(res, null, 'Room or bed not found', 404)
+  if (bed.status === 'OCCUPIED' && bed.bookingId !== booking.id) return response(res, null, 'Selected bed is no longer available', 409)
 
   booking.paymentStatus = 'SUCCESS'
   booking.bookingStatus = 'CONFIRMED'
-  booking.transactionId = paymentId || `PAY-${crypto.randomUUID().slice(0, 8).toUpperCase()}`
+  booking.transactionId = paymentId || `DEMO-${crypto.randomUUID().slice(0, 8).toUpperCase()}`
+  booking.paymentMethod = paymentMethod
+  booking.paidAt = new Date().toISOString()
 
-  if (bed) {
-    bed.status = 'OCCUPIED'
-    bed.occupantName = `${booking.studentName} (Confirmed)`
-    bed.bookingId = booking.id
-    delete bed.reservedUntil
-    delete bed.reservedBy
-  }
+  bed.status = 'OCCUPIED'
+  bed.occupantName = `${booking.studentName} (Confirmed)`
+  bed.bookingId = booking.id
+  delete bed.reservedUntil
+  delete bed.reservedBy
 
   const payment = {
     id: `pay-${Date.now()}`,
@@ -841,15 +830,15 @@ app.post('/api/payments/verify', auth, async (req, res) => {
     studentName: booking.studentName,
     amount: booking.amount,
     transactionId: booking.transactionId,
-    paymentMethod,
+    paymentMethod: paymentMethod || 'Demo Payment',
     paymentStatus: 'SUCCESS',
+    mode: 'DEMO',
     createdAt: new Date().toISOString(),
   }
 
   db.payments.push(payment)
   await write(db)
-
-  return response(res, { booking, payment }, 'Payment verified! Booking confirmed.')
+  return response(res, { booking, payment }, 'Demo payment completed! Booking confirmed.')
 })
 
 app.get('/api/payments/history', auth, async (req, res) => {
