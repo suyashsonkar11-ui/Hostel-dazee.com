@@ -88,7 +88,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         return
       }
 
-      const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/register'
+      const apiBase = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')
+      const endpoint = `${apiBase}${mode === 'login' ? '/api/auth/login' : '/api/auth/register'}`
       const payload =
         mode === 'login'
           ? { email, password }
