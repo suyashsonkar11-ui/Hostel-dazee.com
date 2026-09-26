@@ -9,7 +9,8 @@
     "start": "node server/index.cjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "migrate:mongodb": "node scripts/migrate-json-to-mongodb.cjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
