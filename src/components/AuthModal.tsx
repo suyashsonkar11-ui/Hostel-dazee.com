@@ -67,7 +67,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       if (mode === 'forgot') {
         if (!otpSent) {
-          await fetch('/api/auth/forgot-password', {
+          await fetch(`${(import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')}/api/auth/forgot-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),
@@ -75,7 +75,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           setOtpSent(true)
           setInfoMessage('Demo OTP is 123456. Enter below with new password.')
         } else {
-          const res = await fetch('/api/auth/reset-password', {
+          const res = await fetch(`${(import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')}/api/auth/reset-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, otp, newPassword }),
@@ -122,7 +122,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true)
     setError('')
     try {
-      const response = await fetch('/api/auth/google', {
+      const response = await fetch(`${(import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
