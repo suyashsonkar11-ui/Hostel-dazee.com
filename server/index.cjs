@@ -6,17 +6,45 @@ const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
 
-const STORE_KEY = process.env.STORE_KEY || 'hostel-dazee:app-state'
-const redisUrl = process.env.UPSTASH_REDIS_REST_URL
-const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN
-let memoryStore = null
-let loadPromise = null
+const { connectMongo, getModels, syncStateFromMongo } = require('./db.cjs')
 
-async function redisCommand(command, args = []) {
-  if (!redisUrl || !redisToken) return null
-  const base = redisUrl.replace(/\/$/, '')
-  const url = base + '/' + command.toLowerCase() + (args.length ? '/' + args.map((v) => encodeURIComponent(String(v))).join('/') : '')
-  const response = await fetch(url, { headers: { Authorization: 'Bearer ' + redisToken } })
+let memoryStore = null
+let storePromise = null
+
+const emptyStore = () => ({ users: [], properties: [], rooms: [], beds: [], bookings: [], payments: [], reviews: [], wishlist: [] })
+
+async function ensureStore() {
+  if (memoryStore) return memoryStore
+  if (storePromise) return storePromise
+  storePromise = (async () => {
+    await connectMongo()
+    memoryStore = await syncStateFromMongo()
+    return memoryStore
+  })()
+  try { return await storePromise } finally { storePromise = null }
+}
+
+const read = async () => (await ensureStore()) || emptyStore()
+
+const write = async (data) => {
+  const models = await getModels()
+  const collections = ['users', 'properties', 'rooms', 'beds', 'bookings', 'payments', 'reviews', 'wishlist']
+  for (const name of collections) {
+    const Model = models[name]
+    const items = Array.isArray(data[name]) ? data[name] : []
+    const ids = items.map((item) => item.id).filter(Boolean)
+    if (ids.length) await Model.deleteMany({ id: { $nin: ids } })
+    else await Model.deleteMany({})
+    if (items.length) {
+      await Model.bulkWrite(items.map((item) => ({
+        updateOne: { filter: { id: item.id }, update: { $set: item }, upsert: true }
+      })), { ordered: false })
+    }
+  }
+  memoryStore = data
+  return memoryStore
+}
+const response = await fetch(url, { headers: { Authorization: 'Bearer ' + redisToken } })
   if (!response.ok) throw new Error('Persistent store request failed: ' + response.status)
   const payload = await response.json()
   if (payload.error) throw new Error(payload.error)
