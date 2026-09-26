@@ -1240,3 +1240,55 @@ a {
     width: 100%;
   }
 }
+
+
+/* Continue the same visual language below the fold */
+.about-section,
+.how-section,
+.why-section,
+.reviews-section,
+.contact-section {
+  background: #06130f !important;
+  color: #f4eee2;
+  border-color: rgba(113,164,139,.18) !important;
+}
+.about-section h2,
+.how-section h2,
+.why-section h2,
+.reviews-section h2,
+.contact-section h2 {
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-weight: 400 !important;
+  color: #f4eee2 !important;
+}
+.about-section p,
+.how-section p,
+.why-section p,
+.reviews-section p,
+.contact-section p {
+  color: #aeb9b1;
+}
+.about-section > .container > div > div > div,
+.how-section > .container > div > div > div,
+.contact-section > .container > div > div > div {
+  background: #06251b !important;
+  border-color: rgba(113,164,139,.22) !important;
+  color: #f4eee2;
+}
+.owner-banner {
+  background: linear-gradient(135deg,#06271d 0%,#04130e 100%) !important;
+  border-color: rgba(217,181,104,.16) !important;
+}
+.owner-banner h2 {
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-weight: 400 !important;
+}
+.owner-banner p {
+  color: #b9c2bc !important;
+}
+footer {
+  background: #030d0a !important;
+}
+footer a:hover {
+  color: #d9b568 !important;
+}
