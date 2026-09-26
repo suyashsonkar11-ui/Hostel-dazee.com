@@ -2,8 +2,6 @@ const express = require('express')
 const cors = require('cors')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const fs = require('fs')
-const path = require('path')
 const crypto = require('crypto')
 
 const { connectMongo, getModels, syncStateFromMongo } = require('./db.cjs')
@@ -44,46 +42,14 @@ const write = async (data) => {
   memoryStore = data
   return memoryStore
 }
-const response = await fetch(url, { headers: { Authorization: 'Bearer ' + redisToken } })
-  if (!response.ok) throw new Error('Persistent store request failed: ' + response.status)
-  const payload = await response.json()
-  if (payload.error) throw new Error(payload.error)
-  return payload.result
-}
-
-async function ensureStore() {
-  if (memoryStore) return memoryStore
-  if (loadPromise) return loadPromise
-  loadPromise = (async () => {
-    if (!redisUrl || !redisToken) {
-      if (process.env.NODE_ENV === 'production') throw new Error('UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are required in production')
-      return null
-    }
-    const stored = await redisCommand('get', [STORE_KEY])
-    if (stored) memoryStore = JSON.parse(stored)
-    else {
-      const initial = { users: [], properties: [], rooms: [], beds: [], bookings: [], payments: [], reviews: [] }
-      try { Object.assign(initial, JSON.parse(fs.readFileSync(dataPath, 'utf8'))) } catch (_) {}
-      memoryStore = initial
-      await redisCommand('set', [STORE_KEY, JSON.stringify(memoryStore)])
-    }
-    return memoryStore
-  })()
-  try { return await loadPromise } finally { loadPromise = null }
-}
-
 const app = express()
 const port = process.env.PORT || 5050
-const dataPath = path.resolve(process.env.DATA_FILE || 'server/data.json')
 const secret = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'dev-only-hostel-dazee-secret')
 if (!secret) throw new Error('JWT_SECRET is required in production')
 
 const allowedOrigins = (process.env.FRONTEND_URL || '').split(',').map((v) => v.trim()).filter(Boolean)
 app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : true, credentials: true }))
 app.use(express.json({ limit: '5mb' }))
-
-const read = async () => { const store = await ensureStore(); return store || { users: [], properties: [], rooms: [], beds: [], bookings: [], payments: [], reviews: [] } }
-const write = async (data) => { memoryStore = data; if (redisUrl && redisToken) await redisCommand('set', [STORE_KEY, JSON.stringify(data)]) }
 
 const response = (res, data, message = 'OK', code = 200) =>
   res.status(code).json({ success: code < 400, message, data })
