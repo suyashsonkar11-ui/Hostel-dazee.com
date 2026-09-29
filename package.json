@@ -9,7 +9,8 @@
     "start": "node server/index.cjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "migrate:mongodb": "node scripts/migrate-json-to-mongodb.cjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -18,7 +19,8 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "mongoose": "^9.10.2"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",

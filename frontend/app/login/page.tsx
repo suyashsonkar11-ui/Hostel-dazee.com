@@ -24,7 +24,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     setErrorMsg('')
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const apiBase = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')
+      const endpoint = `${apiBase}/api/auth/login`
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -60,7 +62,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
   return (
     <div style={{ padding: '4rem 1rem', background: '#f8fafc', minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#ffffff', borderRadius: 'var(--radius-xl)', padding: '2.5rem', width: '100%', maxWidth: '460px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}>
+      <div className="auth-page-card" style={{ background: '#ffffff', borderRadius: 'var(--radius-xl)', padding: '2.5rem', width: '100%', maxWidth: '460px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}>
         {/* Logo & Headline */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'var(--accent)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, margin: '0 auto 0.75rem', fontSize: '1.25rem' }}>
@@ -81,14 +83,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         )}
 
         {/* Form */}
-        <form onSubmit={handleLogin}>
+        <form noValidate onSubmit={handleLogin}>
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)', marginBottom: '0.4rem' }}>
               Email Address
             </label>
             <input
               type="email"
-              required
+              inputMode="email"
+              autoComplete="email"
               className="filter-select"
               style={{ width: '100%' }}
               placeholder="e.g. rahul.verma@gmail.com"
@@ -108,7 +111,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             </div>
             <input
               type="password"
-              required
+              autoComplete="current-password"
               className="filter-select"
               style={{ width: '100%' }}
               placeholder="••••••••"

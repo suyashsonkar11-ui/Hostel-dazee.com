@@ -2,34 +2,54 @@ const express = require('express')
 const cors = require('cors')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const fs = require('fs')
-const path = require('path')
 const crypto = require('crypto')
 
+const { connectMongo, getModels, syncStateFromMongo } = require('./db.cjs')
+
+let memoryStore = null
+let storePromise = null
+
+const emptyStore = () => ({ users: [], properties: [], rooms: [], beds: [], bookings: [], payments: [], reviews: [], wishlist: [] })
+
+async function ensureStore() {
+  if (memoryStore) return memoryStore
+  if (storePromise) return storePromise
+  storePromise = (async () => {
+    await connectMongo()
+    memoryStore = await syncStateFromMongo()
+    return memoryStore
+  })()
+  try { return await storePromise } finally { storePromise = null }
+}
+
+const read = async () => (await ensureStore()) || emptyStore()
+
+const write = async (data) => {
+  const models = await getModels()
+  const collections = ['users', 'properties', 'rooms', 'beds', 'bookings', 'payments', 'reviews', 'wishlist']
+  for (const name of collections) {
+    const Model = models[name]
+    const items = Array.isArray(data[name]) ? data[name] : []
+    const ids = items.map((item) => item.id).filter(Boolean)
+    if (ids.length) await Model.deleteMany({ id: { $nin: ids } })
+    else await Model.deleteMany({})
+    if (items.length) {
+      await Model.bulkWrite(items.map((item) => ({
+        updateOne: { filter: { id: item.id }, update: { $set: item }, upsert: true }
+      })), { ordered: false })
+    }
+  }
+  memoryStore = data
+  return memoryStore
+}
 const app = express()
 const port = process.env.PORT || 5050
-const dataPath = path.resolve(process.env.DATA_FILE || 'server/data.json')
-const secret = process.env.JWT_SECRET || 'hostel-dazee-super-secret-key-2025'
+const secret = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'dev-only-hostel-dazee-secret')
+if (!secret) throw new Error('JWT_SECRET is required in production')
 
-app.use(cors())
+const allowedOrigins = (process.env.FRONTEND_URL || '').split(',').map((v) => v.trim()).filter(Boolean)
+app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : true, credentials: true }))
 app.use(express.json({ limit: '5mb' }))
-
-const read = () => {
-  try {
-    return JSON.parse(fs.readFileSync(dataPath, 'utf8'))
-  } catch (err) {
-    console.error('Error reading data.json:', err)
-    return { users: [], properties: [], rooms: [], beds: [], bookings: [], payments: [], reviews: [] }
-  }
-}
-
-const write = (data) => {
-  try {
-    fs.writeFileSync(dataPath, JSON.stringify(data, null, 2))
-  } catch (err) {
-    console.error('Error writing data.json:', err)
-  }
-}
 
 const response = (res, data, message = 'OK', code = 200) =>
   res.status(code).json({ success: code < 400, message, data })
@@ -37,12 +57,12 @@ const response = (res, data, message = 'OK', code = 200) =>
 const tokenFor = (user) =>
   jwt.sign({ id: user.id, role: user.role, email: user.email, name: user.name }, secret, { expiresIn: '7d' })
 
-function auth(req, res, next) {
+async function auth(req, res, next) {
   const header = req.headers.authorization
   if (!header?.startsWith('Bearer ')) return response(res, null, 'Authentication required', 401)
   try {
     const decoded = jwt.verify(header.slice(7), secret)
-    const db = read()
+    const db = await read()
     const foundUser = db.users.find((u) => u.id === decoded.id)
     if (!foundUser) return response(res, null, 'User account not found', 401)
     if (foundUser.isActive === false || foundUser.status === 'suspended') {
@@ -60,7 +80,7 @@ const authorizeRoles = (...allowed) => (req, res, next) =>
   allowed.includes(req.user.role) ? next() : response(res, null, 'Permission denied', 403)
 
 // --- SYSTEM & HEALTH ---
-app.get('/api/health', (req, res) =>
+app.get('/api/health', async (req, res) =>
   response(res, { status: 'ok', time: new Date().toISOString() }, 'Hostel Dazee API is operational')
 )
 
@@ -73,7 +93,7 @@ app.post('/api/auth/register', async (req, res) => {
   if (password.length < 6) {
     return response(res, null, 'Password must be at least 6 characters long', 400)
   }
-  const db = read()
+  const db = await read()
   if (db.users.some((user) => user.email === email.toLowerCase())) {
     return response(res, null, 'An account with this email already exists', 409)
   }
@@ -90,7 +110,7 @@ app.post('/api/auth/register', async (req, res) => {
   }
 
   db.users.push(user)
-  write(db)
+  await write(db)
 
   return response(
     res,
@@ -108,7 +128,7 @@ app.post('/api/auth/login', async (req, res) => {
   if (!email || !password) {
     return response(res, null, 'Please provide email and password', 400)
   }
-  const db = read()
+  const db = await read()
   const user = db.users.find(
     (item) => item.email === String(email).toLowerCase().trim() || item.phone === String(email).trim()
   )
@@ -136,10 +156,10 @@ app.post('/api/auth/login', async (req, res) => {
 })
 
 app.post('/api/auth/google', async (req, res) => {
-  const { email, name, role = 'student' } = req.body
-  if (!email) return response(res, null, 'Google email is required', 400)
+  const { email, name, role = 'student', idToken } = req.body
+  if (!email || !idToken || !process.env.GOOGLE_CLIENT_ID) return response(res, null, 'Verified Google ID token is required and OAuth must be configured.', 501)
 
-  const db = read()
+  const db = await read()
   let user = db.users.find((item) => item.email === email.toLowerCase().trim())
   if (!user) {
     user = {
@@ -153,7 +173,7 @@ app.post('/api/auth/google', async (req, res) => {
       createdAt: new Date().toISOString(),
     }
     db.users.push(user)
-    write(db)
+    await write(db)
   }
 
   return response(
@@ -166,42 +186,42 @@ app.post('/api/auth/google', async (req, res) => {
   )
 })
 
-app.post('/api/auth/forgot-password', (req, res) => {
+app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body
-  const db = read()
+  const db = await read()
   const user = db.users.find((u) => u.email === String(email).toLowerCase().trim())
   if (!user) return response(res, null, 'If this email is registered, an OTP has been sent.', 200)
   // Simulated OTP
-  return response(res, { otpSent: true, demoOtp: '123456' }, 'OTP sent to your email (Demo OTP: 123456)')
+  return response(res, { otpSent: false }, 'Password reset is not configured. Configure a verified OTP provider first.', 503)
 })
 
 app.post('/api/auth/reset-password', async (req, res) => {
   const { email, otp, newPassword } = req.body
-  if (otp !== '123456') return response(res, null, 'Invalid or expired OTP', 400)
+  return response(res, null, 'Password reset is not configured. Configure a verified OTP provider first.', 503)
   if (!newPassword || newPassword.length < 6) return response(res, null, 'Password must be at least 6 characters', 400)
 
-  const db = read()
+  const db = await read()
   const user = db.users.find((u) => u.email === String(email).toLowerCase().trim())
   if (!user) return response(res, null, 'User not found', 404)
 
   user.passwordHash = await bcrypt.hash(newPassword, 10)
-  write(db)
+  await write(db)
   return response(res, null, 'Password successfully reset. Please log in.')
 })
 
-app.post('/api/auth/logout', (req, res) => {
+app.post('/api/auth/logout', async (req, res) => {
   return response(res, null, 'Logged out successfully')
 })
 
-app.get('/api/auth/me', auth, (req, res) => {
-  const user = read().users.find((item) => item.id === req.user.id)
+app.get('/api/auth/me', auth, async (req, res) => {
+  const user = (await read()).users.find((item) => item.id === req.user.id)
   if (!user) return response(res, null, 'User session not found', 404)
   return response(res, { id: user.id, name: user.name, email: user.email, role: user.role, phone: user.phone })
 })
 
 // --- PROPERTIES (PUBLIC & OWNER) ---
-app.get('/api/properties', (req, res) => {
-  const db = read()
+app.get('/api/properties', async (req, res) => {
+  const db = await read()
   let items = db.properties.filter((property) => property.status === 'approved')
   const { city, type, gender, maxPrice, search, amenities } = req.query
 
@@ -248,8 +268,8 @@ app.get('/api/properties', (req, res) => {
   return response(res, enriched, 'Approved properties retrieved')
 })
 
-app.get('/api/properties/:id', (req, res) => {
-  const db = read()
+app.get('/api/properties/:id', async (req, res) => {
+  const db = await read()
   const property = db.properties.find((item) => item.id === req.params.id)
   if (!property) return response(res, null, 'Property not found', 404)
 
@@ -278,13 +298,13 @@ const defaultCityCoords = {
   'Bilaspur': { lat: 22.1287, lng: 82.1384, state: 'Chhattisgarh', pincode: '495009' },
 }
 
-app.post('/api/properties', auth, authorizeRoles('owner', 'admin'), (req, res) => {
+app.post('/api/properties', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
   const { name, description, propertyType, genderType, address, city, state, pincode, startingRent, amenities, images } = req.body
   if (!name || !city || !address) {
     return response(res, null, 'Property name, city and address are required', 400)
   }
 
-  const db = read()
+  const db = await read()
   const matchedCity = defaultCityCoords[city] || { lat: 12.9716, lng: 77.5946, state: state || 'Karnataka', pincode: pincode || '560001' }
   const lat = req.body.latitude ? Number(req.body.latitude) : matchedCity.lat
   const lng = req.body.longitude ? Number(req.body.longitude) : matchedCity.lng
@@ -370,12 +390,12 @@ app.post('/api/properties', auth, authorizeRoles('owner', 'admin'), (req, res) =
     { id: `bed-${Date.now()}-3`, roomId: sampleRoom2.id, bedNumber: 'Bed B', status: 'AVAILABLE' }
   )
 
-  write(db)
+  await write(db)
   return response(res, newProperty, 'Property listed successfully with initial rooms', 201)
 })
 
-app.put('/api/properties/:id', auth, authorizeRoles('owner', 'admin'), (req, res) => {
-  const db = read()
+app.put('/api/properties/:id', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
+  const db = await read()
   const property = db.properties.find((p) => p.id === req.params.id)
   if (!property) return response(res, null, 'Property not found', 404)
   if (req.user.role !== 'admin' && property.ownerId !== req.user.id) {
@@ -411,12 +431,12 @@ app.put('/api/properties/:id', auth, authorizeRoles('owner', 'admin'), (req, res
     },
     updatedAt: new Date().toISOString(),
   })
-  write(db)
+  await write(db)
   return response(res, property, 'Property updated successfully')
 })
 
-app.delete('/api/properties/:id', auth, authorizeRoles('owner', 'admin'), (req, res) => {
-  const db = read()
+app.delete('/api/properties/:id', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
+  const db = await read()
   const idx = db.properties.findIndex((p) => p.id === req.params.id)
   if (idx === -1) return response(res, null, 'Property not found', 404)
   if (req.user.role !== 'admin' && db.properties[idx].ownerId !== req.user.id) {
@@ -433,13 +453,13 @@ app.delete('/api/properties/:id', auth, authorizeRoles('owner', 'admin'), (req, 
   const roomIds = db.rooms.filter((r) => r.propertyId === propId).map((r) => r.id)
   db.rooms = db.rooms.filter((r) => r.propertyId !== propId)
   db.beds = db.beds.filter((b) => !roomIds.includes(b.roomId))
-  write(db)
+  await write(db)
   return response(res, null, 'Property and associated rooms removed safely')
 })
 
 // --- ROOMS & BEDS (VISUAL SELECTION API) ---
-app.get('/api/properties/:id/rooms', (req, res) => {
-  const db = read()
+app.get('/api/properties/:id/rooms', async (req, res) => {
+  const db = await read()
   const rooms = db.rooms
     .filter((r) => r.propertyId === req.params.id)
     .map((room) => ({
@@ -449,13 +469,13 @@ app.get('/api/properties/:id/rooms', (req, res) => {
   return response(res, rooms, 'Rooms loaded')
 })
 
-app.post('/api/properties/:id/rooms', auth, authorizeRoles('owner', 'admin'), (req, res) => {
+app.post('/api/properties/:id/rooms', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
   const { roomNumber, floor = 1, roomType = 'Double Sharing', rent, ac = true, sharingCapacity = 2, features } = req.body
   if (!roomNumber || !rent) {
     return response(res, null, 'Room number and monthly rent are required', 400)
   }
 
-  const db = read()
+  const db = await read()
   const room = {
     id: `room-${Date.now()}`,
     propertyId: req.params.id,
@@ -482,17 +502,17 @@ app.post('/api/properties/:id/rooms', auth, authorizeRoles('owner', 'admin'), (r
     })
   }
 
-  write(db)
+  await write(db)
   return response(res, room, 'Room and bed units generated successfully', 201)
 })
 
-app.post('/api/rooms', auth, authorizeRoles('owner', 'admin'), (req, res) => {
+app.post('/api/rooms', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
   const { propertyId, roomNumber, floor = 1, roomType = 'Double Sharing', rent, ac = true, sharingCapacity = 2, features } = req.body
   if (!propertyId || !roomNumber || !rent) {
     return response(res, null, 'Property ID, room number and monthly rent are required', 400)
   }
 
-  const db = read()
+  const db = await read()
   const property = db.properties.find((p) => p.id === propertyId)
   if (!property) return response(res, null, 'Property not found', 404)
   if (req.user.role !== 'admin' && property.ownerId !== req.user.id) {
@@ -524,12 +544,12 @@ app.post('/api/rooms', auth, authorizeRoles('owner', 'admin'), (req, res) => {
     })
   }
 
-  write(db)
+  await write(db)
   return response(res, room, 'Room and beds generated successfully', 201)
 })
 
-app.put('/api/rooms/:id', auth, authorizeRoles('owner', 'admin'), (req, res) => {
-  const db = read()
+app.put('/api/rooms/:id', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
+  const db = await read()
   const room = db.rooms.find((r) => r.id === req.params.id)
   if (!room) return response(res, null, 'Room not found', 404)
 
@@ -539,12 +559,12 @@ app.put('/api/rooms/:id', auth, authorizeRoles('owner', 'admin'), (req, res) => 
   }
 
   Object.assign(room, req.body)
-  write(db)
+  await write(db)
   return response(res, room, 'Room updated successfully')
 })
 
-app.delete('/api/rooms/:id', auth, authorizeRoles('owner', 'admin'), (req, res) => {
-  const db = read()
+app.delete('/api/rooms/:id', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
+  const db = await read()
   const idx = db.rooms.findIndex((r) => r.id === req.params.id)
   if (idx === -1) return response(res, null, 'Room not found', 404)
 
@@ -556,28 +576,28 @@ app.delete('/api/rooms/:id', auth, authorizeRoles('owner', 'admin'), (req, res) 
 
   db.rooms.splice(idx, 1)
   db.beds = db.beds.filter((b) => b.roomId !== req.params.id)
-  write(db)
+  await write(db)
   return response(res, null, 'Room and associated beds removed')
 })
 
-app.get('/api/rooms/:id/beds', (req, res) => {
-  const db = read()
+app.get('/api/rooms/:id/beds', async (req, res) => {
+  const db = await read()
   const beds = db.beds.filter((b) => b.roomId === req.params.id)
   return response(res, beds, 'Beds loaded')
 })
 
-app.put('/api/beds/:id', auth, authorizeRoles('owner', 'admin'), (req, res) => {
-  const db = read()
+app.put('/api/beds/:id', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
+  const db = await read()
   const bed = db.beds.find((b) => b.id === req.params.id)
   if (!bed) return response(res, null, 'Bed not found', 404)
 
-  Object.assign(bed, req.body)
-  write(db)
+  Object.assign(bed, Object.fromEntries(Object.entries(req.body).filter(([key]) => ['status', 'bedNumber'].includes(key))))
+  await write(db)
   return response(res, bed, 'Bed updated')
 })
 
-app.post('/api/rooms/:id/reserve', auth, (req, res) => {
-  const db = read()
+app.post('/api/rooms/:id/reserve', auth, async (req, res) => {
+  const db = await read()
   const bed = db.beds.find((b) => b.id === req.params.id)
   if (!bed || bed.status !== 'AVAILABLE') {
     return response(res, null, 'Selected bed is no longer available', 409)
@@ -586,12 +606,12 @@ app.post('/api/rooms/:id/reserve', auth, (req, res) => {
   bed.status = 'RESERVED'
   bed.reservedBy = req.user.id
   bed.reservedUntil = Date.now() + 15 * 60 * 1000 // 15 minutes hold
-  write(db)
+  await write(db)
   return response(res, bed, 'Bed reserved for 15 minutes during checkout')
 })
 
 // --- BOOKINGS & CHECKOUT FLOW ---
-app.post('/api/bookings', auth, (req, res) => {
+app.post('/api/bookings', auth, async (req, res) => {
   const {
     propertyId,
     roomId,
@@ -611,7 +631,7 @@ app.post('/api/bookings', auth, (req, res) => {
     return response(res, null, 'Property, Room, and Bed selection are required', 400)
   }
 
-  const db = read()
+  const db = await read()
   const property = db.properties.find((p) => p.id === propertyId)
   const room = db.rooms.find((r) => r.id === roomId)
   const bed = db.beds.find((b) => b.id === bedId)
@@ -666,13 +686,13 @@ app.post('/api/bookings', auth, (req, res) => {
   bed.reservedBy = req.user.id
   bed.reservedUntil = Date.now() + 15 * 60 * 1000 // 15 min lock
   bed.bookingId = booking.id
-  write(db)
+  await write(db)
 
   return response(res, booking, 'Booking created. Proceed to payment.', 201)
 })
 
-app.get('/api/bookings', auth, (req, res) => {
-  const db = read()
+app.get('/api/bookings', auth, async (req, res) => {
+  const db = await read()
   if (req.user.role === 'admin') {
     return response(res, db.bookings, 'All platform bookings retrieved')
   }
@@ -685,15 +705,17 @@ app.get('/api/bookings', auth, (req, res) => {
   return response(res, myBookings, 'Student bookings retrieved')
 })
 
-app.get('/api/bookings/:id', auth, (req, res) => {
-  const db = read()
+app.get('/api/bookings/:id', auth, async (req, res) => {
+  const db = await read()
   const booking = db.bookings.find((b) => b.id === req.params.id)
   if (!booking) return response(res, null, 'Booking not found', 404)
+  if (req.user.role === 'student' && booking.studentId !== req.user.id) return response(res, null, 'Unauthorized', 403)
+  if (req.user.role === 'owner') { const property = db.properties.find((p) => p.id === booking.propertyId); if (!property || property.ownerId !== req.user.id) return response(res, null, 'Unauthorized', 403) }
   return response(res, booking, 'Booking retrieved')
 })
 
-app.put('/api/bookings/:id/cancel', auth, (req, res) => {
-  const db = read()
+app.put('/api/bookings/:id/cancel', auth, async (req, res) => {
+  const db = await read()
   const booking = db.bookings.find((b) => b.id === req.params.id)
   if (!booking) return response(res, null, 'Booking not found', 404)
   if (req.user.role !== 'admin' && booking.studentId !== req.user.id) {
@@ -710,66 +732,69 @@ app.put('/api/bookings/:id/cancel', auth, (req, res) => {
     delete bed.reservedBy
   }
 
-  write(db)
+  await write(db)
   return response(res, booking, 'Booking cancelled and bed released to available pool')
 })
 
-// --- PAYMENTS (RAZORPAY INTEGRATION) ---
-app.post('/api/payments/create-order', auth, (req, res) => {
+// --- PAYMENTS (DEMO MODE) ---
+// Real Razorpay gateway is intentionally disabled for the current demo period.
+// These endpoints preserve the frontend contract and create demo payment records only.
+app.post('/api/payments/create-order', auth, async (req, res) => {
   const { bookingId } = req.body
-  const db = read()
+  const db = await read()
   const booking = db.bookings.find((b) => b.id === bookingId)
   if (!booking) return response(res, null, 'Booking not found', 404)
+  if (req.user.role !== 'admin' && booking.studentId !== req.user.id) return response(res, null, 'Unauthorized payment access', 403)
+  if (booking.paymentStatus === 'SUCCESS') return response(res, null, 'Booking is already paid', 400)
 
-  const razorpayOrder = {
-    orderId: `order_dz_${Date.now()}`,
-    amount: booking.amount * 100, // in paise
+  const demoOrder = {
+    orderId: `demo_order_${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`,
+    amount: booking.amount,
     currency: 'INR',
-    receipt: booking.bookingReference,
-    key: process.env.RAZORPAY_KEY_ID || 'rzp_test_hostel_dazee_demo',
-    booking,
+    mode: 'DEMO',
   }
-
-  return response(res, razorpayOrder, 'Razorpay order generated')
+  booking.demoPaymentOrderId = demoOrder.orderId
+  await write(db)
+  return response(res, demoOrder, 'Demo payment order created')
 })
 
-app.post('/api/payments/create', auth, (req, res) => {
+app.post('/api/payments/create', auth, async (req, res) => {
   const { bookingId } = req.body
-  const db = read()
+  const db = await read()
   const booking = db.bookings.find((b) => b.id === bookingId)
   if (!booking) return response(res, null, 'Booking not found', 404)
-
-  const razorpayOrder = {
-    orderId: `order_dz_${Date.now()}`,
-    amount: booking.amount * 100,
-    currency: 'INR',
-    receipt: booking.bookingReference,
-    key: process.env.RAZORPAY_KEY_ID || 'rzp_test_hostel_dazee_demo',
-    booking,
-  }
-
-  return response(res, razorpayOrder, 'Razorpay order generated')
+  if (req.user.role !== 'admin' && booking.studentId !== req.user.id) return response(res, null, 'Unauthorized payment access', 403)
+  if (booking.paymentStatus === 'SUCCESS') return response(res, null, 'Booking is already paid', 400)
+  const demoOrder = { orderId: 'demo_order_' + crypto.randomUUID().replace(/-/g, '').slice(0, 16), amount: booking.amount, currency: 'INR', mode: 'DEMO' }
+  booking.demoPaymentOrderId = demoOrder.orderId
+  await write(db)
+  return response(res, demoOrder, 'Demo payment order created')
 })
 
-app.post('/api/payments/verify', auth, (req, res) => {
-  const { bookingId, paymentId, paymentMethod = 'Razorpay UPI' } = req.body
-  const db = read()
+app.post('/api/payments/verify', auth, async (req, res) => {
+  const { bookingId, paymentId, paymentMethod = 'Demo Payment' } = req.body
+  const db = await read()
   const booking = db.bookings.find((b) => b.id === bookingId)
   if (!booking) return response(res, null, 'Booking not found', 404)
+  if (req.user.role !== 'admin' && booking.studentId !== req.user.id) return response(res, null, 'Unauthorized payment access', 403)
+  if (booking.paymentStatus === 'SUCCESS') return response(res, { booking }, 'Booking is already confirmed')
 
+  const room = db.rooms.find((r) => r.id === booking.roomId)
   const bed = db.beds.find((b) => b.id === booking.bedId)
+  if (!room || !bed) return response(res, null, 'Room or bed not found', 404)
+  if (bed.status === 'OCCUPIED' && bed.bookingId !== booking.id) return response(res, null, 'Selected bed is no longer available', 409)
 
   booking.paymentStatus = 'SUCCESS'
   booking.bookingStatus = 'CONFIRMED'
-  booking.transactionId = paymentId || `PAY-${crypto.randomUUID().slice(0, 8).toUpperCase()}`
+  booking.transactionId = paymentId || `DEMO-${crypto.randomUUID().slice(0, 8).toUpperCase()}`
+  booking.paymentMethod = paymentMethod
+  booking.paidAt = new Date().toISOString()
 
-  if (bed) {
-    bed.status = 'OCCUPIED'
-    bed.occupantName = `${booking.studentName} (Confirmed)`
-    bed.bookingId = booking.id
-    delete bed.reservedUntil
-    delete bed.reservedBy
-  }
+  bed.status = 'OCCUPIED'
+  bed.occupantName = `${booking.studentName} (Confirmed)`
+  bed.bookingId = booking.id
+  delete bed.reservedUntil
+  delete bed.reservedBy
 
   const payment = {
     id: `pay-${Date.now()}`,
@@ -779,19 +804,19 @@ app.post('/api/payments/verify', auth, (req, res) => {
     studentName: booking.studentName,
     amount: booking.amount,
     transactionId: booking.transactionId,
-    paymentMethod,
+    paymentMethod: paymentMethod || 'Demo Payment',
     paymentStatus: 'SUCCESS',
+    mode: 'DEMO',
     createdAt: new Date().toISOString(),
   }
 
   db.payments.push(payment)
-  write(db)
-
-  return response(res, { booking, payment }, 'Payment verified! Booking confirmed.')
+  await write(db)
+  return response(res, { booking, payment }, 'Demo payment completed! Booking confirmed.')
 })
 
-app.get('/api/payments/history', auth, (req, res) => {
-  const db = read()
+app.get('/api/payments/history', auth, async (req, res) => {
+  const db = await read()
   if (req.user.role === 'admin') {
     return response(res, db.payments, 'All payment history retrieved')
   }
@@ -799,32 +824,32 @@ app.get('/api/payments/history', auth, (req, res) => {
   return response(res, payments, 'Student payment history retrieved')
 })
 
-app.get('/api/bookings/my', auth, (req, res) => {
-  const db = read()
+app.get('/api/bookings/my', auth, async (req, res) => {
+  const db = await read()
   const bookings = db.bookings.filter((b) => b.studentId === req.user.id)
   return response(res, bookings, 'Student bookings retrieved')
 })
 
-app.get('/api/payments/my', auth, (req, res) => {
-  const db = read()
+app.get('/api/payments/my', auth, async (req, res) => {
+  const db = await read()
   const payments = db.payments.filter((p) => p.studentId === req.user.id)
   return response(res, payments, 'Student payment history retrieved')
 })
 
 // --- REVIEWS ---
-app.get('/api/properties/:id/reviews', (req, res) => {
-  const db = read()
+app.get('/api/properties/:id/reviews', async (req, res) => {
+  const db = await read()
   const reviews = db.reviews.filter((r) => r.propertyId === req.params.id)
   return response(res, reviews, 'Property reviews retrieved')
 })
 
-app.post('/api/reviews', auth, (req, res) => {
+app.post('/api/reviews', auth, async (req, res) => {
   const { propertyId, rating, comment } = req.body
   if (!propertyId || !rating || !comment) {
     return response(res, null, 'Property, rating and comment are required', 400)
   }
 
-  const db = read()
+  const db = await read()
   const property = db.properties.find((p) => p.id === propertyId)
   if (!property) return response(res, null, 'Property not found', 404)
 
@@ -846,13 +871,13 @@ app.post('/api/reviews', auth, (req, res) => {
   property.rating = Number(avg.toFixed(1))
   property.reviewCount = allReviews.length
 
-  write(db)
+  await write(db)
   return response(res, review, 'Review submitted successfully', 201)
 })
 
 // --- OWNER PORTAL APIS ---
-app.get('/api/owner/dashboard', auth, authorizeRoles('owner', 'admin'), (req, res) => {
-  const db = read()
+app.get('/api/owner/dashboard', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
+  const db = await read()
   const properties = db.properties.filter((p) => req.user.role === 'admin' || p.ownerId === req.user.id)
   const propIds = properties.map((p) => p.id)
   const rooms = db.rooms.filter((r) => propIds.includes(r.propertyId))
@@ -878,22 +903,22 @@ app.get('/api/owner/dashboard', auth, authorizeRoles('owner', 'admin'), (req, re
   })
 })
 
-app.get('/api/owner/properties', auth, authorizeRoles('owner', 'admin'), (req, res) => {
-  const db = read()
+app.get('/api/owner/properties', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
+  const db = await read()
   const properties = db.properties.filter((p) => req.user.role === 'admin' || p.ownerId === req.user.id)
   return response(res, properties, 'Owner properties retrieved')
 })
 
-app.get('/api/owner/bookings', auth, authorizeRoles('owner', 'admin'), (req, res) => {
-  const db = read()
+app.get('/api/owner/bookings', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
+  const db = await read()
   const properties = db.properties.filter((p) => req.user.role === 'admin' || p.ownerId === req.user.id)
   const propIds = properties.map((p) => p.id)
   const bookings = db.bookings.filter((b) => propIds.includes(b.propertyId))
   return response(res, bookings, 'Owner bookings retrieved')
 })
 
-app.post('/api/owner/bookings/:id/:decision', auth, authorizeRoles('owner', 'admin'), (req, res) => {
-  const db = read()
+app.post('/api/owner/bookings/:id/:decision', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
+  const db = await read()
   const booking = db.bookings.find((b) => b.id === req.params.id)
   if (!booking) return response(res, null, 'Booking not found', 404)
 
@@ -909,12 +934,12 @@ app.post('/api/owner/bookings/:id/:decision', auth, authorizeRoles('owner', 'adm
     if (decision === 'reject') delete bed.occupantName
   }
 
-  write(db)
+  await write(db)
   return response(res, booking, `Booking marked as ${booking.bookingStatus}`)
 })
 
-app.get('/api/owner/students', auth, authorizeRoles('owner', 'admin'), (req, res) => {
-  const db = read()
+app.get('/api/owner/students', auth, authorizeRoles('owner', 'admin'), async (req, res) => {
+  const db = await read()
   const ownerProps = db.properties.filter((p) => req.user.role === 'admin' || p.ownerId === req.user.id)
   const propIds = ownerProps.map((p) => p.id)
   const ownerBookings = db.bookings.filter((b) => propIds.includes(b.propertyId))
@@ -937,8 +962,8 @@ app.get('/api/owner/students', auth, authorizeRoles('owner', 'admin'), (req, res
 })
 
 // --- ADMIN PORTAL APIS ---
-app.get('/api/admin/dashboard', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.get('/api/admin/dashboard', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const totalRevenue = db.payments
     .filter((p) => p.paymentStatus === 'SUCCESS')
     .reduce((sum, p) => sum + (p.amount || 0), 0)
@@ -963,8 +988,8 @@ app.get('/api/admin/dashboard', auth, authorizeRoles('admin'), (req, res) => {
   })
 })
 
-app.get('/api/admin/users', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.get('/api/admin/users', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const sanitized = db.users.map(({ passwordHash: _passwordHash, ...user }) => ({
     ...user,
     status: user.status || (user.isActive !== false ? 'active' : 'suspended'),
@@ -972,31 +997,31 @@ app.get('/api/admin/users', auth, authorizeRoles('admin'), (req, res) => {
   return response(res, sanitized, 'Users retrieved')
 })
 
-app.put('/api/admin/users/:id/suspend', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.put('/api/admin/users/:id/suspend', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const user = db.users.find((u) => u.id === req.params.id)
   if (!user) return response(res, null, 'User not found', 404)
   if (user.role === 'admin') return response(res, null, 'Cannot modify admin account status', 403)
 
   user.isActive = false
   user.status = 'suspended'
-  write(db)
+  await write(db)
   return response(res, { id: user.id, status: user.status, isActive: user.isActive }, 'User suspended successfully')
 })
 
-app.put('/api/admin/users/:id/activate', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.put('/api/admin/users/:id/activate', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const user = db.users.find((u) => u.id === req.params.id)
   if (!user) return response(res, null, 'User not found', 404)
 
   user.isActive = true
   user.status = 'active'
-  write(db)
+  await write(db)
   return response(res, { id: user.id, status: user.status, isActive: user.isActive }, 'User reactivated successfully')
 })
 
-app.delete('/api/admin/users/:id', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.delete('/api/admin/users/:id', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const idx = db.users.findIndex((u) => u.id === req.params.id)
   if (idx === -1) return response(res, null, 'User not found', 404)
   const user = db.users[idx]
@@ -1008,25 +1033,25 @@ app.delete('/api/admin/users/:id', auth, authorizeRoles('admin'), (req, res) => 
   }
 
   db.users.splice(idx, 1)
-  write(db)
+  await write(db)
   return response(res, null, 'User account removed')
 })
 
-app.patch('/api/admin/users/:id/status', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.patch('/api/admin/users/:id/status', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const user = db.users.find((u) => u.id === req.params.id)
   if (!user) return response(res, null, 'User not found', 404)
   if (user.role === 'admin') return response(res, null, 'Cannot modify admin account status', 403)
 
   user.isActive = Boolean(req.body.isActive)
   user.status = user.isActive ? 'active' : 'suspended'
-  write(db)
+  await write(db)
   return response(res, { id: user.id, isActive: user.isActive, status: user.status }, 'User status updated')
 })
 
 // Admin Owners Management
-app.get('/api/admin/owners', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.get('/api/admin/owners', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const owners = db.users
     .filter((u) => u.role === 'owner')
     .map(({ passwordHash, ...owner }) => {
@@ -1044,30 +1069,30 @@ app.get('/api/admin/owners', auth, authorizeRoles('admin'), (req, res) => {
   return response(res, owners, 'Owners list retrieved')
 })
 
-app.put('/api/admin/owners/:id/approve', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.put('/api/admin/owners/:id/approve', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const owner = db.users.find((u) => u.id === req.params.id && u.role === 'owner')
   if (!owner) return response(res, null, 'Owner not found', 404)
   owner.verificationStatus = 'approved'
   owner.status = 'active'
   owner.isActive = true
   delete owner.rejectionReason
-  write(db)
+  await write(db)
   return response(res, owner, 'Owner verification approved')
 })
 
-app.put('/api/admin/owners/:id/reject', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.put('/api/admin/owners/:id/reject', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const owner = db.users.find((u) => u.id === req.params.id && u.role === 'owner')
   if (!owner) return response(res, null, 'Owner not found', 404)
   owner.verificationStatus = 'rejected'
   owner.rejectionReason = req.body.reason || 'Missing or invalid verification documents.'
-  write(db)
+  await write(db)
   return response(res, owner, 'Owner verification rejected with reason')
 })
 
-app.put('/api/admin/owners/:id/suspend', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.put('/api/admin/owners/:id/suspend', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const owner = db.users.find((u) => u.id === req.params.id && u.role === 'owner')
   if (!owner) return response(res, null, 'Owner not found', 404)
   owner.status = 'suspended'
@@ -1078,12 +1103,12 @@ app.put('/api/admin/owners/:id/suspend', auth, authorizeRoles('admin'), (req, re
       p.status = 'suspended'
     }
   })
-  write(db)
+  await write(db)
   return response(res, owner, 'Owner account and listings suspended')
 })
 
-app.put('/api/admin/owners/:id/activate', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.put('/api/admin/owners/:id/activate', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const owner = db.users.find((u) => u.id === req.params.id && u.role === 'owner')
   if (!owner) return response(res, null, 'Owner not found', 404)
   owner.status = 'active'
@@ -1094,12 +1119,12 @@ app.put('/api/admin/owners/:id/activate', auth, authorizeRoles('admin'), (req, r
       p.status = 'approved'
     }
   })
-  write(db)
+  await write(db)
   return response(res, owner, 'Owner account reactivated')
 })
 
-app.delete('/api/admin/owners/:id', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.delete('/api/admin/owners/:id', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const idx = db.users.findIndex((u) => u.id === req.params.id && u.role === 'owner')
   if (idx === -1) return response(res, null, 'Owner not found', 404)
 
@@ -1115,58 +1140,58 @@ app.delete('/api/admin/owners/:id', auth, authorizeRoles('admin'), (req, res) =>
   const removedRoomIds = db.rooms.filter((r) => propIds.includes(r.propertyId)).map((r) => r.id)
   db.rooms = db.rooms.filter((r) => !propIds.includes(r.propertyId))
   db.beds = db.beds.filter((b) => !removedRoomIds.includes(b.roomId))
-  write(db)
+  await write(db)
   return response(res, null, 'Owner and associated listings removed safely')
 })
 
 // Admin Property Management
-app.get('/api/admin/properties', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.get('/api/admin/properties', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   return response(res, db.properties, 'All properties retrieved')
 })
 
-app.put('/api/admin/properties/:id/approve', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.put('/api/admin/properties/:id/approve', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const property = db.properties.find((p) => p.id === req.params.id)
   if (!property) return response(res, null, 'Property not found', 404)
   property.status = 'approved'
   delete property.rejectionReason
-  write(db)
+  await write(db)
   return response(res, property, 'Property approved successfully.')
 })
 
-app.put('/api/admin/properties/:id/reject', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.put('/api/admin/properties/:id/reject', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const property = db.properties.find((p) => p.id === req.params.id)
   if (!property) return response(res, null, 'Property not found', 404)
   const reason = req.body?.reason || req.body?.rejectionReason
   if (!reason) return response(res, null, 'Rejection reason is required.', 400)
   property.status = 'rejected'
   property.rejectionReason = reason
-  write(db)
+  await write(db)
   return response(res, property, 'Property rejected with reason.')
 })
 
-app.put('/api/admin/properties/:id/suspend', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.put('/api/admin/properties/:id/suspend', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const property = db.properties.find((p) => p.id === req.params.id)
   if (!property) return response(res, null, 'Property not found', 404)
   property.status = 'suspended'
-  write(db)
+  await write(db)
   return response(res, property, 'Property has been suspended by admin.')
 })
 
-app.put('/api/admin/properties/:id/activate', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.put('/api/admin/properties/:id/activate', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const property = db.properties.find((p) => p.id === req.params.id)
   if (!property) return response(res, null, 'Property not found', 404)
   property.status = 'approved'
-  write(db)
+  await write(db)
   return response(res, property, 'Property restored to approved state.')
 })
 
-app.delete('/api/admin/properties/:id', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.delete('/api/admin/properties/:id', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const idx = db.properties.findIndex((p) => p.id === req.params.id)
   if (idx === -1) return response(res, null, 'Property not found', 404)
 
@@ -1180,12 +1205,12 @@ app.delete('/api/admin/properties/:id', auth, authorizeRoles('admin'), (req, res
   const roomIds = db.rooms.filter((r) => r.propertyId === propId).map((r) => r.id)
   db.rooms = db.rooms.filter((r) => r.propertyId !== propId)
   db.beds = db.beds.filter((b) => !roomIds.includes(b.roomId))
-  write(db)
+  await write(db)
   return response(res, null, 'Property deleted successfully')
 })
 
-app.post('/api/admin/properties/:id/:decision', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.post('/api/admin/properties/:id/:decision', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const property = db.properties.find((p) => p.id === req.params.id)
   if (!property) return response(res, null, 'Property not found', 404)
 
@@ -1199,27 +1224,27 @@ app.post('/api/admin/properties/:id/:decision', auth, authorizeRoles('admin'), (
   } else if (decision === 'suspend') property.status = 'suspended'
   else if (decision === 'activate') property.status = 'approved'
 
-  write(db)
+  await write(db)
   return response(res, property, `Property has been ${property.status}`)
 })
 
-app.get('/api/admin/bookings', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.get('/api/admin/bookings', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   return response(res, db.bookings, 'All platform bookings retrieved')
 })
 
-app.get('/api/admin/payments', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.get('/api/admin/payments', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   return response(res, db.payments, 'All payment transactions retrieved')
 })
 
-app.get('/api/admin/reviews', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.get('/api/admin/reviews', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   return response(res, db.reviews, 'All property reviews retrieved')
 })
 
-app.get('/api/admin/reports', auth, authorizeRoles('admin'), (req, res) => {
-  const db = read()
+app.get('/api/admin/reports', auth, authorizeRoles('admin'), async (req, res) => {
+  const db = await read()
   const revenue = db.payments.reduce((sum, p) => sum + (p.amount || 0), 0)
   return response(res, {
     totalRevenue: revenue,
@@ -1242,8 +1267,8 @@ if (fs.existsSync(distPath)) {
   })
 }
 
-app.use('/api', (req, res) => response(res, null, 'Endpoint not found', 404))
+app.use('/api', async (req, res) => response(res, null, 'Endpoint not found', 404))
 
-app.listen(port, () => {
-  console.log(`Hostel Dazee live server listening on http://localhost:${port}`)
-})
+if (require.main === module) { app.listen(port, () => console.log(`Hostel Dazee live server listening on http://localhost:${port}`)) }
+
+module.exports = app

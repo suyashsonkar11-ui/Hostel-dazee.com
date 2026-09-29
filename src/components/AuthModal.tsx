@@ -49,13 +49,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    // Safari can surface a native "The string did not match the expected pattern."
+    // validation message for controlled email inputs. Validate explicitly so the
+    // demo login and normal login behave consistently across browsers.
+    if (mode !== 'forgot' && !email.trim()) {
+      setError('Please enter your email address.')
+      return
+    }
+    if (mode !== 'forgot' && !password) {
+      setError('Please enter your password.')
+      return
+    }
     setInfoMessage('')
     setLoading(true)
 
     try {
       if (mode === 'forgot') {
         if (!otpSent) {
-          await fetch('/api/auth/forgot-password', {
+          await fetch(`${(import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')}/api/auth/forgot-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),
@@ -63,7 +75,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           setOtpSent(true)
           setInfoMessage('Demo OTP is 123456. Enter below with new password.')
         } else {
-          const res = await fetch('/api/auth/reset-password', {
+          const res = await fetch(`${(import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')}/api/auth/reset-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, otp, newPassword }),
@@ -76,7 +88,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         return
       }
 
-      const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/register'
+      const apiBase = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')
+      const endpoint = `${apiBase}${mode === 'login' ? '/api/auth/login' : '/api/auth/register'}`
       const payload =
         mode === 'login'
           ? { email, password }
@@ -109,7 +122,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true)
     setError('')
     try {
-      const response = await fetch('/api/auth/google', {
+      const response = await fetch(`${(import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '')}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -197,7 +210,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {mode === 'signup' && (
               <>
                 <div>
@@ -280,7 +293,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
                 <input
                   type="password"
-                  required
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                   className="filter-select"
                   style={{ width: '100%' }}
                   placeholder="••••••••"
