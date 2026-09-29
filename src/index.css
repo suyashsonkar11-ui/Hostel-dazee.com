@@ -1292,3 +1292,145 @@ footer {
 footer a:hover {
   color: #d9b568 !important;
 }
+
+/* ===== Premium Student Marketplace Homepage ===== */
+.dazee-section-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:2rem}
+.dazee-section-heading.centered{justify-content:center;text-align:center}
+.dazee-section-heading h2{font-size:clamp(2rem,4vw,3.25rem);line-height:1.05;letter-spacing:-.045em;color:var(--primary);margin:.4rem 0 .7rem}
+.dazee-section-heading p{max-width:680px;color:var(--text-muted);font-size:1.05rem}
+.dazee-section-heading>a{color:var(--accent);font-weight:700;white-space:nowrap}
+.dazee-destinations,.dazee-services,.dazee-about,.dazee-steps,.dazee-testimonials,.dazee-faq,.dazee-contact{padding:6rem 0;background:#fff}
+.dazee-destination-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.dazee-destination-card{height:260px;border-radius:22px;overflow:hidden;position:relative;color:#fff;background:#0f172a}
+.dazee-destination-card img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.dazee-destination-card:hover img{transform:scale(1.05)}
+.dazee-destination-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(2,6,23,.78))}
+.dazee-destination-card strong,.dazee-destination-card span{position:absolute;left:1.2rem;z-index:1}
+.dazee-destination-card strong{bottom:2.5rem;font-size:1.45rem}
+.dazee-destination-card span{bottom:1rem;font-size:.82rem;color:#e2e8f0}
+.dazee-stats-band{background:#061a13;color:#fff;padding:2.2rem 0}
+.dazee-stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.dazee-stat{text-align:center;padding:1rem;border-right:1px solid rgba(255,255,255,.12)}
+.dazee-stat:last-child{border-right:0}
+.dazee-stat strong{display:block;font:400 clamp(2rem,4vw,3rem)/1 Georgia,serif;color:#d9b568}
+.dazee-stat span{display:block;margin-top:.5rem;color:#b9c5be;font-size:.82rem}
+.dazee-services{background:#f8fafc}
+.dazee-service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.dazee-service-card{background:#fff;border:1px solid #e2e8f0;border-radius:22px;padding:1.8rem;min-height:190px;transition:.25s}
+.dazee-service-card:hover{transform:translateY(-4px);box-shadow:0 18px 45px rgba(15,23,42,.09);border-color:#f2c86d}
+.dazee-service-icon{font-size:2rem;margin-bottom:1.3rem}
+.dazee-service-card h3{font-size:1.2rem;margin-bottom:.45rem;color:#111827}
+.dazee-service-card p{color:#64748b;line-height:1.6;font-size:.92rem}
+.dazee-about{background:#06130f;color:#f8f2e8}
+.dazee-about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.dazee-about-copy h2{font:400 clamp(2.4rem,5vw,4.5rem)/.98 Georgia,serif;letter-spacing:-.04em;margin:.5rem 0 1.25rem}
+.dazee-about-copy p{color:#b9c5be;max-width:580px;font-size:1.08rem;line-height:1.75}
+.dazee-check-list{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.8rem 0 2rem}
+.dazee-check-list div{color:#e7ebe7;font-size:.9rem}
+.dazee-check-list span{color:#d9b568;font-weight:800;margin-right:.45rem}
+.dazee-about-visual{position:relative}
+.dazee-about-visual img{display:block;width:100%;height:520px;object-fit:cover;border-radius:26px}
+.dazee-about-badge{position:absolute;left:1rem;bottom:1rem;padding:1rem 1.2rem;border-radius:16px;background:rgba(3,20,14,.88);backdrop-filter:blur(12px);border:1px solid rgba(217,181,104,.3)}
+.dazee-about-badge strong,.dazee-about-badge span{display:block}
+.dazee-about-badge strong{color:#d9b568}
+.dazee-about-badge span{color:#c8d0ca;font-size:.78rem;margin-top:.2rem}
+.dazee-steps{background:#fff}
+.dazee-step-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#e2e8f0;border:1px solid #e2e8f0;border-radius:22px;overflow:hidden}
+.dazee-step{background:#fff;padding:2rem 1.5rem;min-height:210px}
+.dazee-step>span{display:block;color:#d9b568;font:400 2rem Georgia,serif;margin-bottom:1.5rem}
+.dazee-step h3{font-size:1.15rem;margin-bottom:.5rem}
+.dazee-step p{color:#64748b;line-height:1.6;font-size:.9rem}
+.dazee-owner-cta{padding:5rem 0;background:linear-gradient(120deg,#06251b,#0c3b2b);color:#fff}
+.dazee-owner-cta .container{display:flex;align-items:center;justify-content:space-between;gap:2rem}
+.dazee-owner-cta h2{font:400 clamp(2rem,4vw,3.4rem)/1.05 Georgia,serif;max-width:720px;margin:.4rem 0 .8rem}
+.dazee-owner-cta p{max-width:700px;color:#c0ccc5}
+.dazee-owner-button{background:#d9b568;color:#10130f;border:0}
+.dazee-testimonials{background:#f8fafc}
+.dazee-testimonial-card{max-width:820px;margin:auto;background:#fff;border:1px solid #e2e8f0;border-radius:26px;padding:2.5rem;box-shadow:0 20px 50px rgba(15,23,42,.06)}
+.dazee-stars{color:#d9a441;letter-spacing:.18em;margin-bottom:1rem}
+.dazee-testimonial-card>p{font:400 clamp(1.25rem,2.5vw,1.8rem)/1.55 Georgia,serif;color:#1f2937}
+.dazee-testimonial-person{display:flex;align-items:center;gap:.8rem;margin-top:1.8rem}
+.dazee-testimonial-person img{width:52px;height:52px;border-radius:50%;object-fit:cover}
+.dazee-testimonial-person strong,.dazee-testimonial-person span{display:block}
+.dazee-testimonial-person span{font-size:.82rem;color:#64748b;margin-top:.15rem}
+.dazee-dots{display:flex;justify-content:center;gap:.5rem;margin-top:1.2rem}
+.dazee-dots button{width:9px;height:9px;border:0;border-radius:50%;background:#cbd5e1}
+.dazee-dots button.active{width:28px;border-radius:9px;background:#d9b568}
+.dazee-faq{background:#fff}
+.dazee-faq-list{max-width:900px;margin:auto;border-top:1px solid #e2e8f0}
+.dazee-faq-item{border-bottom:1px solid #e2e8f0}
+.dazee-faq-item button{width:100%;border:0;background:none;display:flex;justify-content:space-between;gap:1rem;text-align:left;padding:1.5rem 0;font-size:1.15rem;font-weight:700;color:#111827;cursor:pointer}
+.dazee-faq-item button b{color:#d9b568;font-size:1.5rem}
+.dazee-faq-item p{max-width:800px;padding:0 3rem 1.5rem 0;color:#64748b;line-height:1.75}
+.dazee-contact{background:#06130f;color:#fff}
+.dazee-contact h2{font:400 clamp(2.4rem,5vw,4rem)/1 Georgia,serif;margin:.5rem 0}
+.dazee-contact> .container>p{color:#b9c5be;max-width:650px}
+.dazee-contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem}
+.dazee-contact-grid a{background:#09271e;border:1px solid rgba(113,164,139,.25);border-radius:18px;padding:1.4rem;color:#fff}
+.dazee-contact-grid span{display:block;color:#d9b568;font-size:1.6rem;margin-bottom:.8rem}
+.dazee-contact-grid strong,.dazee-contact-grid small{display:block}
+.dazee-contact-grid small{color:#aeb9b1;margin-top:.25rem}
+.dazee-footer{background:#030d0a;color:#fff;padding:4rem 0 2rem}
+.dazee-footer-grid{display:grid;grid-template-columns:1.7fr repeat(3,1fr);gap:2.5rem}
+.dazee-footer-grid h4{color:#d9b568;margin-bottom:1rem}
+.dazee-footer-grid a{display:block;color:#aeb9b1;margin:.55rem 0;font-size:.88rem}
+.dazee-footer-brand p{color:#8f9d95;margin-top:.8rem}
+.dazee-footer-bottom{border-top:1px solid rgba(255,255,255,.1);margin-top:2.5rem;padding-top:1.5rem;display:flex;justify-content:space-between;gap:1rem;color:#748179;font-size:.78rem}
+.dazee-mobile-bottom-nav{display:none}
+
+.nav-login,.nav-user-button,.nav-logout{background:none;border:0;color:#cbd5e1;cursor:pointer;font-weight:600}
+.nav-cta{padding:.7rem 1rem}
+.mobile-menu-button{display:none;border:0;background:none;color:#fff;font-size:1.6rem;cursor:pointer}
+.mobile-menu-panel{position:absolute;left:0;right:0;top:100%;background:#06130f;border-top:1px solid rgba(255,255,255,.08);padding:1rem;display:flex;flex-direction:column;z-index:110}
+.mobile-menu-panel a,.mobile-menu-panel button{padding:1rem;text-align:left;background:none;border:0;color:#fff;font-size:1rem}
+
+@media(max-width:900px){
+ .dazee-destination-grid,.dazee-service-grid{grid-template-columns:repeat(2,1fr)}
+ .dazee-about-grid{grid-template-columns:1fr}
+ .dazee-about-visual img{height:380px}
+ .dazee-step-grid{grid-template-columns:repeat(2,1fr)}
+ .dazee-footer-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+ body{padding-bottom:76px}
+ .container{padding-left:1.15rem;padding-right:1.15rem}
+ .navbar-inner{height:4.1rem;padding:0 1rem}
+ .brand-logo{font-size:1.05rem}
+ .brand-icon{width:1.75rem;height:1.75rem}
+ .nav-links-desktop,.nav-login,.nav-user-button,.nav-logout,.nav-cta{display:none}
+ .mobile-menu-button{display:block}
+ .luxury-hero{min-height:680px}
+ .luxury-hero .hero-container{min-height:680px}
+ .luxury-hero .hero-copy{padding:4.8rem 0 2rem}
+ .luxury-hero .hero-title{font-size:3rem}
+ .luxury-hero .hero-lead{font-size:.95rem}
+ .luxury-search .search-fields-grid{grid-template-columns:1fr 1fr}
+ .luxury-search .search-field{padding:.6rem}
+ .luxury-search .search-field input,.luxury-search .search-field select{font-size:.78rem}
+ .luxury-stats{grid-template-columns:repeat(2,1fr)}
+ .dazee-section-heading{display:block}
+ .dazee-section-heading>a{display:inline-block;margin-top:.8rem}
+ .dazee-destinations,.dazee-services,.dazee-about,.dazee-steps,.dazee-testimonials,.dazee-faq,.dazee-contact{padding:4rem 0}
+ .dazee-destination-grid,.dazee-service-grid,.dazee-contact-grid{grid-template-columns:1fr}
+ .dazee-destination-card{height:220px}
+ .dazee-stats-grid{grid-template-columns:repeat(2,1fr)}
+ .dazee-stat{border-bottom:1px solid rgba(255,255,255,.12)}
+ .dazee-stat:nth-child(2){border-right:0}
+ .dazee-about-copy h2{font-size:2.7rem}
+ .dazee-check-list{grid-template-columns:1fr}
+ .dazee-about-visual img{height:340px}
+ .dazee-step-grid{grid-template-columns:1fr}
+ .dazee-step{min-height:auto;padding:1.4rem}
+ .dazee-owner-cta .container{display:block}
+ .dazee-owner-button{margin-top:1.3rem;width:100%}
+ .dazee-testimonial-card{padding:1.5rem}
+ .dazee-faq-item button{font-size:1rem}
+ .dazee-footer-grid{grid-template-columns:1fr 1fr;gap:1.5rem}
+ .dazee-footer-brand{grid-column:1/-1}
+ .dazee-footer-bottom{display:block}
+ .dazee-footer-bottom span{display:block;margin:.4rem 0}
+ .dazee-mobile-bottom-nav{position:fixed;display:grid;grid-template-columns:repeat(4,1fr);left:0;right:0;bottom:0;height:72px;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-top:1px solid #e2e8f0;z-index:150}
+ .dazee-mobile-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#334155;font-size:.68rem}
+ .dazee-mobile-bottom-nav span{font-size:1.35rem;line-height:1}
+ .dazee-mobile-bottom-nav b{font-weight:600}
+}
