@@ -27,18 +27,21 @@ const testimonials = [
     name: 'Rohan Deshmukh',
     role: 'Student · Bengaluru',
     avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
+    rating: 5,
     text: 'Hostel Dazee made comparing student stays much easier. I could check the room options and amenities before deciding where to stay.',
   },
   {
     name: 'Ananya Kulkarni',
     role: 'Student · Pune',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+    rating: 5,
     text: 'The biggest difference for me was having student-focused information in one place instead of searching through dozens of listings.',
   },
   {
     name: 'Vikram Singh',
     role: 'Student · Delhi NCR',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    rating: 5,
     text: 'The property details and bed selection made the booking process feel much more transparent.',
   },
 ]
