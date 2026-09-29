@@ -24,91 +24,57 @@ export const Navbar: React.FC<NavbarProps> = ({ user, onOpenAuth, onLogout, onOp
       e.preventDefault()
       onNavigate(dest)
     }
+    setMobileMenuOpen(false)
   }
 
   return (
     <header className="navbar-sticky">
       <div className="navbar-inner">
-        {/* Brand Logo */}
-        <a
-          href="/"
-          className="brand-logo"
-          onClick={(e) => handleNavClick(e, '/')}
-        >
+        <a href="/" className="brand-logo" onClick={(e) => handleNavClick(e, '/')}>
           <span className="brand-icon">D</span>
           <span>Hostel Dazee<span className="brand-dot">.</span></span>
         </a>
 
-        {/* Desktop Links */}
         <nav className="nav-links-desktop">
-          <a
-            href="/explore"
-            className="nav-link"
-            onClick={(e) => handleNavClick(e, '/explore')}
-          >
-            Explore Stays
-          </a>
-          <a href="/how-it-works" className="nav-link" onClick={(e) => handleNavClick(e, '/how-it-works')}>How It Works</a>
-          <a href="/about" className="nav-link" onClick={(e) => handleNavClick(e, '/about')}>About</a>
-          <a href="/#why" className="nav-link">Why Dazee</a>
-          <a href="/register?role=owner" className="nav-link" onClick={(e) => handleNavClick(e, '/register?role=owner')}>For Owners</a>
-          <a href="/contact" className="nav-link" onClick={(e) => handleNavClick(e, '/contact')}>Contact</a>
+          <a href="/explore" className="nav-link" onClick={(e) => handleNavClick(e, '/explore')}>Explore</a>
+          <a href="#destinations" className="nav-link">Cities</a>
+          <a href="#how" className="nav-link">How it works</a>
+          <a href="#about" className="nav-link">About</a>
+          <a href="#owners" className="nav-link">For Owners</a>
+          <a href="#contact" className="nav-link">Contact</a>
         </nav>
 
-        {/* Right Actions */}
         <div className="nav-actions">
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <button
-                className="btn btn-outline btn-sm"
-                onClick={onOpenDashboard}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                title="Go to Dashboard"
-              >
-                <span
-                  style={{
-                    width: '1.5rem',
-                    height: '1.5rem',
-                    borderRadius: '50%',
-                    background: 'var(--accent)',
-                    color: '#fff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                  }}
-                >
-                  {user.name.charAt(0).toUpperCase()}
-                </span>
-                <span>{user.name.split(' ')[0]} ({user.role})</span>
-              </button>
-              <button className="btn btn-outline btn-sm" onClick={onLogout}>
-                Log out
-              </button>
-            </div>
+            <>
+              <button className="nav-user-button" onClick={onOpenDashboard}>Hi, {user.name.split(' ')[0]}</button>
+              <button className="btn btn-accent nav-cta" onClick={onOpenDashboard}>Dashboard</button>
+              <button className="nav-logout" onClick={onLogout}>Log out</button>
+            </>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <button className="btn btn-outline btn-sm" onClick={() => onOpenAuth('login')}>
-                Log in
-              </button>
-              <button className="btn btn-accent btn-sm" onClick={() => onOpenAuth('signup')}>
-                Get Started
-              </button>
-            </div>
+            <>
+              <button className="nav-login" onClick={() => onOpenAuth('login')}>Log in</button>
+              <button className="btn btn-accent nav-cta" onClick={() => onOpenAuth('signup', 'student')}>Find your stay</button>
+            </>
           )}
-
-          {/* Mobile hamburger button */}
-          <button
-            className="btn btn-outline btn-sm"
-            style={{ display: 'none' }}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle Navigation"
-          >
-            ☰
+          <button className="mobile-menu-button" onClick={() => setMobileMenuOpen((v) => !v)} aria-label="Open menu">
+            {mobileMenuOpen ? '×' : '☰'}
           </button>
         </div>
       </div>
+
+      {mobileMenuOpen && (
+        <div className="mobile-menu-panel">
+          <a href="/explore" onClick={(e) => handleNavClick(e, '/explore')}>Explore Stays</a>
+          <a href="#destinations" onClick={() => setMobileMenuOpen(false)}>Popular Cities</a>
+          <a href="#how" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
+          <a href="#about" onClick={() => setMobileMenuOpen(false)}>About Hostel Dazee</a>
+          <a href="#owners" onClick={() => setMobileMenuOpen(false)}>List Your Property</a>
+          <a href="#contact" onClick={() => setMobileMenuOpen(false)}>Support</a>
+          {!user && <button onClick={() => { setMobileMenuOpen(false); onOpenAuth('login') }}>Login</button>}
+          {user && <button onClick={() => { setMobileMenuOpen(false); onOpenDashboard() }}>My Dashboard</button>}
+        </div>
+      )}
     </header>
   )
 }
