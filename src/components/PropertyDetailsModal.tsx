@@ -69,18 +69,14 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal-card"
-        style={{ maxWidth: '880px', width: '95%' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
+      <div className="property-fullscreen-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close-btn property-modal-close" onClick={onClose} aria-label="Close modal">
           ×
         </button>
 
         {/* Gallery Section */}
-        <div style={{ padding: '1.5rem 1.5rem 0' }}>
-          <div style={{ height: '360px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', marginBottom: '0.75rem' }}>
+        <div className="property-gallery-shell">
+          <div className="property-hero-gallery">
             <img
               src={property.images[activeImageIndex] || property.images[0]}
               alt={property.name}
@@ -88,21 +84,12 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
             />
           </div>
           {property.images.length > 1 && (
-            <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+            <div className="property-gallery-thumbs">
               {property.images.map((img, idx) => (
                 <button
                   key={img + idx}
                   onClick={() => setActiveImageIndex(idx)}
-                  style={{
-                    width: '80px',
-                    height: '60px',
-                    borderRadius: 'var(--radius-sm)',
-                    overflow: 'hidden',
-                    border: activeImageIndex === idx ? '2px solid var(--accent)' : '2px solid transparent',
-                    cursor: 'pointer',
-                    padding: 0,
-                    flexShrink: 0,
-                  }}
+                  className={`property-gallery-thumb ${activeImageIndex === idx ? 'active' : ''}`}
                 >
                   <img src={img} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
@@ -112,7 +99,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
         </div>
 
         {/* Property Header */}
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)' }}>
+        <div className="property-fullscreen-header">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
             <div>
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.35rem' }}>
@@ -156,7 +143,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', padding: '0 1.5rem', background: '#f8fafc', overflowX: 'auto' }}>
+        <div className="property-detail-tabs">
           {[
             { id: 'rooms', label: '🛏️ Rooms & Bed Selector' },
             { id: 'location', label: '📍 Location & Directions' },
@@ -167,17 +154,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              style={{
-                padding: '0.85rem 1.25rem',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                border: 'none',
-                background: 'transparent',
-                borderBottom: activeTab === tab.id ? '2px solid var(--accent)' : '2px solid transparent',
-                color: activeTab === tab.id ? 'var(--accent)' : 'var(--text-muted)',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}
+              className={`property-detail-tab ${activeTab === tab.id ? 'active' : ''}`}
             >
               {tab.label}
             </button>
@@ -185,7 +162,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
         </div>
 
         {/* Tab Content Panels */}
-        <div style={{ padding: '1.5rem' }}>
+        <div className="property-detail-content">
           {activeTab === 'rooms' && (
             <RoomBedSelector
               rooms={rooms}
