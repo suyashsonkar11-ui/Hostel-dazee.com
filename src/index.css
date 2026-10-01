@@ -1132,3 +1132,26 @@ a {
  .property-fullscreen-header h2{font-size:1.5rem!important}
  .property-detail-content{padding:1rem}
 }
+
+/* --- OWNER PORTAL SETTINGS --- */
+.owner-settings-grid{display:grid;grid-template-columns:320px 1fr;gap:1.25rem;align-items:start}
+.owner-settings-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-xl);padding:1.5rem;box-shadow:var(--shadow-sm)}
+.owner-settings-profile{text-align:center}
+.owner-settings-avatar{width:72px;height:72px;margin:0 auto .75rem;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#dbeafe;color:#0369a1;font-size:1.7rem;font-weight:800}
+.owner-settings-profile h3{margin:.2rem 0}
+.owner-settings-profile p{margin:0 0 .75rem;color:var(--text-muted);font-size:.82rem}
+.owner-settings-business{margin-top:1.25rem;padding:1rem;text-align:left;background:#f8fafc;border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;gap:.25rem}
+.owner-settings-business span{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:700}
+.owner-settings-card h2{margin:.25rem 0 1.1rem;font-size:1.25rem}
+.owner-settings-form{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.owner-settings-form label{font-size:.74rem;color:var(--text-muted);font-weight:700}
+.owner-settings-form input{width:100%;margin-top:.35rem;padding:.7rem .75rem;border:1px solid var(--border);border-radius:9px;background:#f8fafc;color:var(--text-main)}
+.owner-security-box{margin-top:1rem;padding:1rem;border-radius:11px;background:var(--accent-soft);color:#047857}
+.owner-security-box p{margin:.25rem 0 0;color:var(--text-muted);font-size:.78rem;line-height:1.5}
+.owner-preference-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)}
+.owner-preference-row:last-child{border-bottom:0}
+.owner-preference-row div{display:flex;flex-direction:column;gap:.2rem}
+.owner-preference-row span{font-size:.75rem;color:var(--text-muted)}
+.owner-preference-row input{width:18px;height:18px;accent-color:#059669}
+.owner-settings-actions{display:flex;gap:.6rem;flex-wrap:wrap}
+@media(max-width:900px){.owner-settings-grid{grid-template-columns:1fr}.owner-settings-form{grid-template-columns:1fr}}
