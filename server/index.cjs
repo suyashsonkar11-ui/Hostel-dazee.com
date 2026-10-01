@@ -424,7 +424,10 @@ app.delete('/api/properties/:id', auth, authorizeRoles('owner', 'admin'), (req, 
   }
 
   const propId = db.properties[idx].id
-  const hasActiveBookings = db.bookings.some((b) => b.propertyId === propId && b.bookingStatus === 'CONFIRMED')
+  const hasActiveBookings = db.bookings.some((b) => {
+    const status = String(b.bookingStatus || '').toUpperCase()
+    return b.propertyId === propId && status === 'CONFIRMED'
+  })
   if (hasActiveBookings) {
     return response(res, null, 'Cannot delete property with active confirmed resident bookings. Suspend property instead.', 400)
   }
@@ -434,7 +437,7 @@ app.delete('/api/properties/:id', auth, authorizeRoles('owner', 'admin'), (req, 
   db.rooms = db.rooms.filter((r) => r.propertyId !== propId)
   db.beds = db.beds.filter((b) => !roomIds.includes(b.roomId))
   write(db)
-  return response(res, null, 'Property and associated rooms removed safely')
+  return response(res, { propertyId: propId, deletedRooms: roomIds.length }, 'Property and associated rooms removed successfully')
 })
 
 // --- ROOMS & BEDS (VISUAL SELECTION API) ---
