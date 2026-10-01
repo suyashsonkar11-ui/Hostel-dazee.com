@@ -21,7 +21,7 @@ const CITY_COORDS: Record<string, { lat: number; lng: number; state: string; pin
 }
 
 export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ user, onLogout, onNavigateHome }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'properties' | 'rooms' | 'bookings' | 'students' | 'analytics'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'properties' | 'rooms' | 'bookings' | 'students' | 'analytics' | 'settings'>('properties')
   const [stats, setStats] = useState<any>({
     totalProperties: 0,
     totalRooms: 0,
@@ -99,7 +99,11 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ user, onLogout, 
 
       if (dataDashboard.success) setStats(dataDashboard.data)
       if (dataProps.success) {
-        setProperties(dataProps.data || [])
+        setProperties([...(dataProps.data || [])].sort((a: any, b: any) => {
+          const aTime = new Date(a.createdAt || 0).getTime()
+          const bTime = new Date(b.createdAt || 0).getTime()
+          return bTime - aTime
+        }))
         if (dataProps.data?.length && !selectedPropertyId) {
           setSelectedPropertyId(dataProps.data[0].id)
         }
@@ -361,6 +365,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ user, onLogout, 
             { id: 'bookings', label: '📋 Booking Requests' },
             { id: 'students', label: '👥 Resident Students' },
             { id: 'analytics', label: '📈 Revenue & Occupancy' },
+            { id: 'settings', label: '⚙️ Settings' },
           ].map((item) => (
             <button
               key={item.id}
@@ -402,7 +407,12 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ user, onLogout, 
           <div>
             <span className="eyebrow">PROPERTY OWNER PORTAL</span>
             <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary)' }}>
-              Owner Studio
+              {activeTab === 'properties' ? 'My Properties' :
+               activeTab === 'settings' ? 'Account Settings' :
+               activeTab === 'rooms' ? 'Rooms & Beds' :
+               activeTab === 'bookings' ? 'Booking Requests' :
+               activeTab === 'students' ? 'Resident Students' :
+               activeTab === 'analytics' ? 'Revenue & Occupancy' : 'Owner Studio'}
             </h1>
           </div>
           <button className="btn btn-accent btn-sm" onClick={() => setActiveTab('properties')}>
@@ -1132,6 +1142,57 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ user, onLogout, 
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {/* SETTINGS TAB */}
+        {activeTab === 'settings' && (
+          <div className="owner-settings-grid">
+            <section className="owner-settings-card owner-settings-profile">
+              <div className="owner-settings-avatar">{user.name.charAt(0).toUpperCase()}</div>
+              <h3>{user.name}</h3>
+              <p>{user.email}</p>
+              <span className="badge badge-verified">Verified Owner</span>
+              <div className="owner-settings-business">
+                <span>Business</span>
+                <strong>{(user as any).businessName || 'Accommodation Owner'}</strong>
+              </div>
+            </section>
+
+            <section className="owner-settings-card">
+              <span className="eyebrow">ACCOUNT</span>
+              <h2>Owner Profile</h2>
+              <div className="owner-settings-form">
+                <label>Full Name<input readOnly value={user.name} /></label>
+                <label>Email<input readOnly value={user.email} /></label>
+                <label>Mobile<input readOnly value={(user as any).phone || ''} placeholder="+91 Mobile number" /></label>
+                <label>Account Type<input readOnly value="Property Owner" /></label>
+                <label>Verification Status<input readOnly value={(user as any).verificationStatus || 'Verified'} /></label>
+                <label>Business Name<input readOnly value={(user as any).businessName || ''} /></label>
+              </div>
+              <div className="owner-security-box">
+                <strong>✓ Account secured</strong>
+                <p>Your owner session is authenticated. Property, booking and student information is restricted to your own listings.</p>
+              </div>
+            </section>
+
+            <section className="owner-settings-card">
+              <span className="eyebrow">PREFERENCES</span>
+              <h2>Portal Preferences</h2>
+              <div className="owner-preference-row"><div><strong>Booking notifications</strong><span>Receive alerts for new booking requests.</span></div><input type="checkbox" defaultChecked /></div>
+              <div className="owner-preference-row"><div><strong>Property updates</strong><span>Show moderation and listing updates in the portal.</span></div><input type="checkbox" defaultChecked /></div>
+              <div className="owner-preference-row"><div><strong>Resident updates</strong><span>Keep resident booking information available to your team.</span></div><input type="checkbox" defaultChecked /></div>
+            </section>
+
+            <section className="owner-settings-card">
+              <span className="eyebrow">ACCOUNT ACTIONS</span>
+              <h2>Security & Support</h2>
+              <div className="owner-settings-actions">
+                <button className="btn btn-outline" onClick={() => setActiveTab('properties')}>Back to My Properties</button>
+                <button className="btn btn-outline" onClick={onNavigateHome}>View Public Website</button>
+                <button className="btn btn-outline" style={{ color: '#dc2626', borderColor: '#fecaca' }} onClick={onLogout}>Sign Out</button>
+              </div>
+            </section>
           </div>
         )}
 
