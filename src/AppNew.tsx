@@ -532,7 +532,12 @@ export default function AppNew() {
         </main>
       )
     }
-    return <StudentDashboard user={user} onLogout={handleLogout} onNavigateHome={() => navigate('/')} />
+    return <StudentDashboard
+      user={user}
+      onLogout={handleLogout}
+      onNavigateHome={() => navigate('/')}
+      onNavigateExplore={() => navigate('/explore')}
+    />
   }
 
   // --- ROUTE: /dashboard/owner or /owner/dashboard ---
