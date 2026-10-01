@@ -10,6 +10,11 @@ export function getStoredUser(): User | null {
   }
 }
 
+export function getStoredToken(): string | null {
+  if (typeof window === 'undefined') return null
+  return window.localStorage.getItem('dazee-token')
+}
+
 export function setStoredSession(token: string, user: User) {
   if (typeof window === 'undefined') return
   localStorage.setItem('dazee-token', token)
