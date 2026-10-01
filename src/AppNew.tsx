@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Navbar } from './components/Navbar'
 import type { User } from './components/Navbar'
 import { Hero } from './components/Hero'
@@ -12,6 +12,7 @@ import StudentDashboard from './StudentDashboard'
 import OwnerDashboard from './OwnerDashboard'
 import AdminDashboard from './AdminDashboard'
 import type { Room, Bed } from './components/RoomBedSelector'
+import { clearStoredSession, getStoredToken, getStoredUser, setStoredSession } from './lib/auth'
 
 // Next.js App Router Page components
 import { ExplorePage } from '../frontend/app/explore/page'
@@ -112,13 +113,7 @@ const fallbackProperties: Property[] = [
 export default function AppNew() {
   const [properties, setProperties] = useState<Property[]>(fallbackProperties)
   const [selectedCity, setSelectedCity] = useState('All')
-  const [user, setUser] = useState<User | null>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('dazee-user') || 'null')
-    } catch {
-      return null
-    }
-  })
+  const [user, setUser] = useState<User | null>(() => getStoredUser())
 
   // Modals & Navigation
   const [authModalOpen, setAuthModalOpen] = useState(false)
@@ -139,11 +134,34 @@ export default function AppNew() {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
-  const navigate = (dest: string) => {
-    window.history.pushState({}, '', dest)
-    setPath(dest)
+  const navigate = useCallback((dest: string, replace = false) => {
+    const normalized = dest || '/'
+    if (replace) window.history.replaceState({}, '', normalized)
+    else window.history.pushState({}, '', normalized)
+    setPath(window.location.pathname)
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  }, [])
+
+  useEffect(() => {
+    const token = getStoredToken()
+    const storedUser = getStoredUser()
+    if (!token || !storedUser) return
+
+    fetch('/api/auth/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Session expired')
+        const data = await res.json()
+        if (!data.success || !data.data) throw new Error('Invalid session')
+        setUser(data.data as User)
+        setStoredSession(token, data.data as User)
+      })
+      .catch(() => {
+        clearStoredSession()
+        setUser(null)
+      })
+  }, [])
 
   // Fetch approved properties from API
   const fetchProperties = async () => {
@@ -216,15 +234,31 @@ export default function AppNew() {
     setAuthModalOpen(true)
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('dazee-token')
-    localStorage.removeItem('dazee-user')
-    setUser(null)
-    navigate('/')
+  const handleLogout = async () => {
+    const token = getStoredToken()
+    try {
+      if (token) {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      }
+    } catch {
+      // Always complete local sign-out.
+    } finally {
+      clearStoredSession()
+      setUser(null)
+      navigate('/', true)
+    }
   }
 
-  const navigateToDashboard = (targetUser: User = user!) => {
-    const dest = targetUser.role === 'admin' ? '/admin' : `/dashboard/${targetUser.role}`
+  const navigateToDashboard = (targetUser?: User | null) => {
+    const activeUser = targetUser ?? getStoredUser() ?? user
+    if (!activeUser) {
+      navigate('/login')
+      return
+    }
+    const dest = activeUser.role === 'admin' ? '/admin' : `/dashboard/${activeUser.role}`
     navigate(dest)
   }
 
