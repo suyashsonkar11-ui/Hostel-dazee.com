@@ -8,7 +8,7 @@ const crypto = require('crypto')
 
 const app = express()
 const port = process.env.PORT || 5050
-const dataPath = path.resolve(process.env.DATA_FILE || 'server/data.json')
+const dataPath = path.resolve(process.env.DATA_FILE || path.join(__dirname, 'data.json'))
 const secret = process.env.JWT_SECRET || 'hostel-dazee-super-secret-key-2025'
 
 app.use(cors())
@@ -1244,6 +1244,10 @@ if (fs.existsSync(distPath)) {
 
 app.use('/api', (req, res) => response(res, null, 'Endpoint not found', 404))
 
-app.listen(port, () => {
-  console.log(`Hostel Dazee live server listening on http://localhost:${port}`)
-})
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Hostel Dazee live server listening on http://localhost:${port}`)
+  })
+}
+
+module.exports = app
